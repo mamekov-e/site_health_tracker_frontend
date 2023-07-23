@@ -1,0 +1,90 @@
+#root {
+    margin-bottom: 5%;
+}
+
+.form-row1 {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.lists-header {
+    float: left;
+    display: flex;
+    gap: 15px;
+    align-items: center
+}
+
+.error-message {
+    position: absolute;
+    /*top: 50%;*/
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #cc1d23;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 999; /* Устанавливаем высокий z-index, чтобы сообщение было поверх остальных элементов */
+}
+
+table {
+    table-layout: fixed;
+}
+
+.info-border {
+    border: 1px solid #17a2b8;
+}
+
+.btn-up-style {
+    border: 1px solid rgb(1, 109, 68);
+    color: #016d44;
+    text-align: center;
+    font-weight: bold;
+}
+
+.btn-down-style {
+
+}
+
+.page-num {
+    width: 45px !important;
+    border: 1px solid #17a2b8;
+    color: #17a2b8;
+    text-align: center;
+    font-weight: bold;
+}
+
+.arrow {
+    width: 0;
+    height: 0;
+    float: right;
+    margin-top: 5px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    display: inline-block;
+}
+
+.arrow-up {
+    border-bottom: 10px solid white;
+}
+
+.arrow-down {
+    border-top: 10px solid white;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #606060;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #bebebe;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #bebebe;
+}
