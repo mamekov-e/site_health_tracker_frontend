@@ -1,5 +1,6 @@
 import * as SGT from "./siteGroupTypes";
 import axios from "axios";
+import {ADD_SITES_TO_GROUP_REQUEST, FETCH_SITE_GROUP_SITES_REQUEST} from "./siteGroupTypes";
 
 export const saveSiteGroup = (siteGroup) => {
     return (dispatch) => {
@@ -8,6 +9,22 @@ export const saveSiteGroup = (siteGroup) => {
         });
         axios
             .post("http://localhost:8080/api/v1/site-groups", siteGroup)
+            .then((response) => {
+                dispatch(siteGroupSuccess(response.data));
+            })
+            .catch((error) => {
+                dispatch(siteGroupFailure(error));
+            });
+    };
+};
+
+export const addSitesToGroup = (siteGroupId, sites) => {
+    return (dispatch) => {
+        dispatch({
+            type: SGT.ADD_SITES_TO_GROUP_REQUEST,
+        });
+        axios
+            .post("http://localhost:8080/api/v1/site-groups/" + siteGroupId + "/sites", sites)
             .then((response) => {
                 dispatch(siteGroupSuccess(response.data));
             })
@@ -33,6 +50,22 @@ export const fetchSiteGroup = (siteGroupId) => {
     };
 };
 
+// export const fetchSiteGroupSitesById = (siteGroupId) => {
+//     return (dispatch) => {
+//         dispatch({
+//             type: SGT.FETCH_SITE_GROUP_SITES_REQUEST,
+//         });
+//         axios
+//             .get("http://localhost:8080/api/v1/site-groups/" + siteGroupId + "/sites")
+//             .then((response) => {
+//                 dispatch(siteGroupSuccess(response.data));
+//             })
+//             .catch((error) => {
+//                 dispatch(siteGroupFailure(error));
+//             });
+//     };
+// };
+
 export const updateSiteGroup = (siteGroup) => {
     return (dispatch) => {
         dispatch({
@@ -56,6 +89,23 @@ export const deleteSiteGroup = (siteGroupId) => {
         });
         axios
             .delete("http://localhost:8080/api/v1/site-groups/" + siteGroupId)
+            .then((response) => {
+                dispatch(siteGroupSuccess(response.data));
+            })
+            .catch((error) => {
+                dispatch(siteGroupFailure(error));
+            });
+    };
+};
+
+
+export const deleteSitesOfGroup = (siteGroupId, sites) => {
+    return (dispatch) => {
+        dispatch({
+            type: SGT.DELETE_SITES_OF_GROUP_REQUEST,
+        });
+        axios
+            .delete("http://localhost:8080/api/v1/site-groups/" + siteGroupId + "/sites", sites)
             .then((response) => {
                 dispatch(siteGroupSuccess(response.data));
             })

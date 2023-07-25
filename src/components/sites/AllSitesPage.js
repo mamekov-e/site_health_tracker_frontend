@@ -11,7 +11,7 @@ import {
     faExternalLinkAlt,
     faFastBackward,
     faFastForward,
-    faList,
+    faList, faRedo,
     faSearch,
     faStepBackward,
     faStepForward,
@@ -21,11 +21,9 @@ import {
 import {Link} from "react-router-dom";
 import ToastMessage from "../custom/ToastMessage";
 import axios from "axios";
-import {millisToInterval} from "../../utils/dateUtil";
 
 class AllSitesPage extends Component {
     constructor(props) {
-        console.log(props)
         super(props);
         this.state = {
             sites: [],
@@ -237,15 +235,9 @@ class AllSitesPage extends Component {
                 </div>
                 <Card className={"border border-dark bg-dark text-white"}>
                     <Card.Header>
-                        <div className={"lists-header"}>
+                        <div className={"content-header"}>
                             <FontAwesomeIcon icon={faList}/>
                             <h6 style={{margin: 0}}>Список сайтов</h6>
-                            <Link
-                                to={"sites/add/"}
-                                className="btn btn-sm btn-outline-light"
-                            >
-                                Добавить сайт
-                            </Link>{" "}
                         </div>
                         <div style={{float: "right"}}>
                             <InputGroup size="sm">
@@ -281,6 +273,24 @@ class AllSitesPage extends Component {
                         </div>
                     </Card.Header>
                     <Card.Body>
+                        <div className={"mb-3"}>
+                            <Link
+                                to={"sites/add/"}
+                                className="btn btn-sm btn-outline-light"
+                            >
+                                Добавить сайт
+                            </Link>
+                            <Button
+                                style={{float:"right"}}
+                                size="sm"
+                                variant="outline-info"
+                                className={"m-1"}
+                                type="button"
+                                onClick={()=>{this.findAllSites(currentPage)}}
+                            >
+                                Обновить <FontAwesomeIcon icon={faRedo}/>
+                            </Button>
+                        </div>
                         <Table bordered hover striped responsive={"md"} variant="dark">
                             <thead>
                             <tr>
@@ -318,15 +328,14 @@ class AllSitesPage extends Component {
                                         <td>
                                             <Button
                                                 type="button"
+                                                size={"sm"}
                                                 variant={site.status === "DOWN" ? "danger" : "success"}
                                                 style={{cursor: "default", pointerEvents: "none"}}
                                             >
                                                 {site.status === "DOWN" ? "недоступен" : "доступен"}
                                             </Button>
                                         </td>
-                                        <td>{
-                                            millisToInterval(site.siteHealthCheckInterval)
-                                        }</td>
+                                        <td>{site.siteHealthCheckInterval + " сек."}</td>
                                         <td>
                                             <ButtonGroup className={"d-flex gap-2"}>
                                                 <Link

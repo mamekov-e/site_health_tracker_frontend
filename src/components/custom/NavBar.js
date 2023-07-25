@@ -10,7 +10,7 @@ class NavBar extends React.Component {
         return (
             <Navbar bg="dark" data-bs-theme="dark"  className={"mb-3"}>
                 <Container>
-                    <Link to={"/"} className={"navbar-brand d-flex flex-row align-items-center gap-3"}>
+                    <Link to={"#"} className={"navbar-brand d-flex flex-row align-items-center gap-3"}>
                         <img style={{width: 50, height: 40, borderRadius: 5, background: '#393646'}}
                              src={appLogo} alt={''}/>
                         <h5 className={"m-0"}>

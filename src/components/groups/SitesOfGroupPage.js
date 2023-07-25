@@ -1,17 +1,17 @@
 import React, {Component} from "react";
 
 import {connect} from "react-redux";
-import {deleteSiteGroup} from "../../services/index";
+import {deleteSitesOfGroup, fetchSiteGroup} from "../../services/index";
 
 import "./../../assets/css/style.css";
 import {Button, ButtonGroup, Card, FormControl, InputGroup, Table,} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
-    faEdit,
+    faArrowLeft,
     faExternalLinkAlt,
     faFastBackward,
     faFastForward,
-    faList, faRedo,
+    faRedo,
     faSearch,
     faStepBackward,
     faStepForward,
@@ -22,69 +22,109 @@ import {Link} from "react-router-dom";
 import ToastMessage from "../custom/ToastMessage";
 import axios from "axios";
 import {getGroupStatusBtnColor, getGroupStatusMsg} from "../../utils/statusConverter";
+import SearchAndAddSiteModal from "../custom/SearchAndAddSiteModal";
 
-class AllSiteGroupsPage extends Component {
+class SitesOfGroup extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            siteGroups: [],
+            addSiteToGroupShow: false,
+            sites: [],
+            siteGroup: {
+                status: "",
+                name: ""
+            },
             search: "",
             currentPage: 1,
-            siteGroupsPerPage: 5,
+            sitesPerPage: 5,
             pageNumbers: [{value: 1, display: 1}],
             sortDir: "asc",
         };
     }
 
+    sortData = () => {
+        setTimeout(() => {
+            this.state.sortDir === "asc"
+                ? this.setState({sortDir: "desc"})
+                : this.setState({sortDir: "asc"});
+            this.findAllSites(this.state.currentPage);
+        }, 500);
+    };
+
     componentDidMount() {
-        this.findAllSiteGroups(this.state.currentPage);
+        const siteGroupId = +this.props.match.params.id;
+        console.log(siteGroupId)
+        if (siteGroupId) {
+            this.setState({siteGroupId: siteGroupId})
+            this.findAllGroupSitesById(this.state.currentPage, siteGroupId)
+            this.findSiteGroupById(siteGroupId)
+        }
     }
 
-    findAllSiteGroups(currentPage) {
+    findAllGroupSitesById(currentPage, siteGroupId) {
         currentPage -= 1;
         axios
             .get(
-                "http://localhost:8080/api/v1/site-groups?pageNumber=" +
+                "http://localhost:8080/api/v1/site-groups/" + siteGroupId +
+                "/sites?pageNumber=" +
                 currentPage +
                 "&pageSize=" +
-                this.state.siteGroupsPerPage +
+                this.state.sitesPerPage +
                 "&sortBy=name&sortDir=" +
                 this.state.sortDir
             )
             .then((response) => response.data)
             .then((data) => {
+                console.log(data)
                 const totalPages = data.totalPages;
                 this.setState({
-                    siteGroups: data.content,
+                    sites: data.content,
                     totalPages: totalPages,
                     totalElements: data.totalElements,
                     currentPage: data.number + 1,
                 });
                 this.getAllPageNumbers(totalPages);
-
             })
             .catch((error) => {
                 console.log(error);
             });
     }
 
-    deleteSiteGroup = (siteGroupId) => {
-        this.props.deleteSiteGroup(siteGroupId);
+    findSiteGroupById = (siteGroupId) => {
+        this.props.fetchSiteGroup(siteGroupId);
         setTimeout(() => {
-            if (this.props.siteGroupObject != null) {
-                this.setState({show: true});
-                setTimeout(() => {
-                    this.setState({show: false})
-                }, 2000);
-                if (this.isLastElementOnPage() && this.state.currentPage !== 1) {
-                    this.findAllSiteGroups(this.state.currentPage - 1);
-                } else {
-                    this.findAllSiteGroups(this.state.currentPage);
-                }
-            } else {
-                this.setState({show: false});
+            let siteGroup = this.props.siteGroupObject.siteGroup;
+            console.log("this.props", this.props.siteGroupObject)
+            if (siteGroup != null) {
+                this.setState({
+                    siteGroup: {
+                        name: siteGroup.name,
+                        status: siteGroup.status
+                    }
+                });
             }
-        }, 500);
+        }, 300);
+    };
+
+    deleteSitesOfGroup = (groupId, sites) => {
+        // this.props.deleteSitesOfGroup(groupId, sites);
+        // setTimeout(() => {
+        //     if (this.props.siteObject != null) {
+        //         this.setState({show: true});
+        //         setTimeout(() => {
+        //             this.setState({show: false});
+        //         }, 2000);
+        //         const currentPage = this.state.currentPage;
+        //         const siteGroupId = this.state.siteGroupId;
+        //         if (this.isLastElementOnPage() && currentPage !== 1) {
+        //             this.findAllGroupSitesById(currentPage - 1, siteGroupId);
+        //         } else {
+        //             this.findAllGroupSitesById(currentPage, siteGroupId);
+        //         }
+        //     } else {
+        //         this.setState({show: false});
+        //     }
+        // }, 500);
     };
 
     isLastElementOnPage() {
@@ -117,13 +157,13 @@ class AllSiteGroupsPage extends Component {
         this.setState({
             [event.target.name]: targetPage,
         });
-        const totalPages = Math.ceil(this.state.totalElements / this.state.siteGroupsPerPage);
+        const totalPages = Math.ceil(this.state.totalElements / this.state.sitesPerPage);
         targetPage = parseInt(targetPage);
         if (targetPage > 0 && targetPage <= totalPages) {
             if (this.state.search) {
                 this.searchData(targetPage);
             } else {
-                this.findAllSiteGroups(targetPage);
+                this.findAllGroupSitesById(targetPage, this.state.siteGroupId);
             }
         }
     };
@@ -134,7 +174,7 @@ class AllSiteGroupsPage extends Component {
             if (this.state.search) {
                 this.searchData(firstPage);
             } else {
-                this.findAllSiteGroups(firstPage);
+                this.findAllGroupSitesById(firstPage, this.state.siteGroupId);
             }
         }
     };
@@ -145,20 +185,20 @@ class AllSiteGroupsPage extends Component {
             if (this.state.search) {
                 this.searchData(this.state.currentPage - prevPage);
             } else {
-                this.findAllSiteGroups(this.state.currentPage - prevPage);
+                this.findAllGroupSitesById(this.state.currentPage - prevPage, this.state.siteGroupId);
             }
         }
     };
 
     lastPage = () => {
         let condition = Math.ceil(
-            this.state.totalElements / this.state.siteGroupsPerPage
+            this.state.totalElements / this.state.sitesPerPage
         );
         if (this.state.currentPage < condition) {
             if (this.state.search) {
                 this.searchData(condition);
             } else {
-                this.findAllSiteGroups(condition);
+                this.findAllGroupSitesById(condition, this.state.siteGroupId);
             }
         }
     };
@@ -166,12 +206,12 @@ class AllSiteGroupsPage extends Component {
     nextPage = () => {
         if (
             this.state.currentPage <
-            Math.ceil(this.state.totalElements / this.state.siteGroupsPerPage)
+            Math.ceil(this.state.totalElements / this.state.sitesPerPage)
         ) {
             if (this.state.search) {
                 this.searchData(this.state.currentPage + 1);
             } else {
-                this.findAllSiteGroups(this.state.currentPage + 1);
+                this.findAllGroupSitesById(this.state.currentPage + 1, this.state.siteGroupId);
             }
         }
     };
@@ -184,26 +224,29 @@ class AllSiteGroupsPage extends Component {
 
     cancelSearch = () => {
         this.setState({search: ""});
-        console.log("this.state.currentPage", this.state.currentPage)
-        this.findAllSiteGroups(this.state.currentPage);
+        this.findAllGroupSitesById(this.state.currentPage, this.state.siteGroupId);
     };
 
     searchData = (currentPage) => {
+        let currentPageForSearch = !isNaN(currentPage) ? currentPage : this.state.currentPage;
+        console.log("currentPage", !isNaN(currentPage))
+        console.log("currentPage", currentPage)
+        console.log("currentPageForSearch", this.state.currentPage)
         const searchValue = this.state.search.trim();
-        if (searchValue !== "") {
-            currentPage -= 1;
+        if (searchValue) {
+            currentPageForSearch -= 1;
             axios.get(
-                "http://localhost:8080/api/v1/site-groups/search/" +
+                "http://localhost:8080/api/v1/site-groups/" + this.state.siteGroupId + "/sites/search/" +
                 searchValue +
                 "?page=" +
-                currentPage +
+                currentPageForSearch +
                 "&size=" +
-                this.state.siteGroupsPerPage
+                this.state.sitesPerPage
             )
                 .then((response) => response.data)
                 .then((data) => {
                     this.setState({
-                        siteGroups: data.content,
+                        sites: data.content,
                         totalPages: data.totalPages,
                         totalElements: data.totalElements,
                         currentPage: data.number + 1,
@@ -213,30 +256,44 @@ class AllSiteGroupsPage extends Component {
         } else {
             this.setState({search: ""})
         }
-    };
+    }
+
+    handleModalShow = () => {
+        this.setState({addSiteToGroupShow: true})
+    }
+
+    handleModalClose = () => {
+        this.setState({addSiteToGroupShow: false})
+    }
 
     render() {
-        const {siteGroups, currentPage, totalPages, search} = this.state;
+        const {sites, siteGroup, currentPage, totalPages, search, addSiteToGroupShow} = this.state;
 
         return (
             <div>
                 <div style={{display: this.state.show ? "block" : "none"}}>
                     <ToastMessage
                         show={this.state.show}
-                        message={"Группа успешно удалена."}
+                        message={"Сайт успешно удален из группы."}
                         type={"danger"}
                     />
                 </div>
+                {addSiteToGroupShow && (
+                    <SearchAndAddSiteModal handleModalClose={this.handleModalClose}
+                                           addSiteToGroupShow={addSiteToGroupShow}
+                                           siteGroupId={this.state.siteGroupId}/>
+                )}
                 <Card className={"border border-dark bg-dark text-white"}>
                     <Card.Header>
                         <div className={"content-header"}>
-                            <FontAwesomeIcon icon={faList}/>
-                            <h6 style={{margin: 0}}>Список групп</h6>
+                            <FontAwesomeIcon icon={faArrowLeft} onClick={this.props.history.goBack}
+                                             style={{cursor: "pointer"}}/>
+                            <h6 style={{margin: 0}}>Список сайтов группы -  <span className={"text-light"}>{siteGroup.name}</span></h6>
                         </div>
                         <div style={{float: "right"}}>
                             <InputGroup size="sm">
                                 <FormControl
-                                    style={{width: "250px", textColor: "blue"}}
+                                    style={{width: "250px"}}
                                     placeholder="Поиск"
                                     name="search"
                                     value={search}
@@ -247,8 +304,8 @@ class AllSiteGroupsPage extends Component {
                                     <Button
                                         size="sm"
                                         variant="outline-info"
-                                        type="button"
                                         className={"m-1"}
+                                        type="button"
                                         onClick={this.searchData}
                                     >
                                         <FontAwesomeIcon icon={faSearch}/>
@@ -268,73 +325,92 @@ class AllSiteGroupsPage extends Component {
                     </Card.Header>
                     <Card.Body>
                         <div className={"mb-3"}>
-                            <Link
-                                to={"site-groups/add/"}
-                                className="btn btn-sm btn-outline-light"
-                            >
-                                Добавить группу
-                            </Link>
                             <Button
-                                style={{float:"right"}}
                                 size="sm"
-                                variant="outline-info"
-                                className={"m-1"}
-                                type="button"
-                                onClick={()=>{this.findAllSiteGroups(currentPage)}}
+                                variant="outline-light"
+                                onClick={() => {
+                                    this.setState({addSiteToGroupShow: true})
+                                }}
                             >
-                                Обновить <FontAwesomeIcon icon={faRedo}/>
+                                Добавить сайт в группу
                             </Button>
+                            {/*<Link*/}
+                            {/*    to={"/site-groups/"+this.state.siteGroupId+"/sites/add"}*/}
+                            {/*    className="btn btn-sm btn-outline-light"*/}
+                            {/*>*/}
+                            {/*    Добавить сайт в группу*/}
+                            {/*</Link>*/}
+                            <div style={{float: "right"}}>
+                                <Button
+                                    size={"sm"}
+                                    type="button"
+                                    variant={getGroupStatusBtnColor(siteGroup)}
+                                    style={{cursor: "default", pointerEvents: "none"}}
+                                >
+                                    {getGroupStatusMsg(siteGroup)}
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant="outline-info"
+                                    className={"m-1"}
+                                    type="button"
+                                    onClick={() => {
+                                        this.findAllGroupSitesById(currentPage, this.state.siteGroupId)
+                                    }}
+                                >
+                                    Обновить <FontAwesomeIcon icon={faRedo}/>
+                                </Button>
+                            </div>
                         </div>
                         <Table bordered hover striped responsive={"md"} variant="dark">
                             <thead>
                             <tr>
                                 <th>Название</th>
                                 <th>Описание</th>
+                                <th>URL</th>
                                 <th>Статус</th>
+                                <th>Периодичность</th>
                                 <th>Действия</th>
                             </tr>
                             </thead>
                             <tbody>
-                            {siteGroups.length === 0 ? (
+                            {sites.length === 0 ? (
                                 <tr align="center">
-                                    <td colSpan="4">Список пуст</td>
+                                    <td colSpan="6">Список пуст</td>
                                 </tr>
                             ) : (
-                                siteGroups.map((siteGroup) => (
-                                    <tr key={siteGroup.id}>
-                                        <td> {siteGroup.name}</td>
-                                        <td>{siteGroup.description}</td>
+                                sites.map((site) => (
+                                    <tr key={site.id}>
+                                        <td> {site.name}</td>
+                                        <td>{site.description}</td>
+                                        <td>{site.url}</td>
                                         <td>
                                             <Button
                                                 type="button"
-                                                size={"sm"}
-                                                variant={getGroupStatusBtnColor(siteGroup)}
+                                                variant={site.status === "DOWN" ? "danger" : "success"}
                                                 style={{cursor: "default", pointerEvents: "none"}}
                                             >
-                                                {getGroupStatusMsg(siteGroup)}
+                                                {site.status === "DOWN" ? "недоступен" : "доступен"}
                                             </Button>
                                         </td>
+                                        <td>{site.siteHealthCheckInterval + " сек."}</td>
                                         <td>
                                             <ButtonGroup className={"d-flex gap-2"}>
-                                                <Link
-                                                    to={"site-groups/edit/" + siteGroup.id}
-                                                    className="btn btn-sm btn-outline-primary"
-                                                >
-                                                    <FontAwesomeIcon icon={faEdit}/>
-                                                </Link>
                                                 <Button
                                                     size="sm"
                                                     variant="outline-danger"
-                                                    onClick={() => this.deleteSiteGroup(siteGroup.id)}
+                                                    onClick={() => this.deleteSitesOfGroup(site.id)}
                                                 >
                                                     <FontAwesomeIcon icon={faTrash}/>
                                                 </Button>
-                                                <Link
-                                                    to={"site-groups/" + siteGroup.id + "/sites"}
-                                                    className="btn btn-sm btn-outline-warning"
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline-warning"
+                                                    onClick={() => {
+                                                    }}
                                                 >
                                                     <FontAwesomeIcon icon={faExternalLinkAlt}/>
-                                                </Link>
+                                                </Button>
                                             </ButtonGroup>
                                         </td>
                                     </tr>
@@ -343,7 +419,7 @@ class AllSiteGroupsPage extends Component {
                             </tbody>
                         </Table>
                     </Card.Body>
-                    {siteGroups.length > 0 ? (
+                    {sites.length > 0 ? (
                         <Card.Footer>
                             <div style={{float: "left"}}>
                                 Страница {currentPage} из {totalPages}
@@ -413,15 +489,16 @@ class AllSiteGroupsPage extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        siteGroupObject: state.siteGroup,
+        siteGroupObject: state.siteGroup
     };
 };
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        deleteSiteGroup: (siteGroupId) => dispatch(deleteSiteGroup(siteGroupId)),
+        deleteSitesOfGroup: (siteId, sites) => dispatch(deleteSitesOfGroup(siteId, sites)),
+        fetchSiteGroup: (siteGroupId) => dispatch(fetchSiteGroup(siteGroupId)),
     };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(AllSiteGroupsPage);
+export default connect(mapStateToProps, mapDispatchToProps)(SitesOfGroup);
 

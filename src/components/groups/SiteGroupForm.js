@@ -1,5 +1,9 @@
 import React, {Component} from "react";
 
+import * as yup from "yup";
+import ru from "yup-locale-ru";
+import * as formik from "formik";
+
 import {connect} from "react-redux";
 import {fetchSiteGroup, saveSiteGroup, updateSiteGroup,} from "../../services/index";
 
@@ -13,9 +17,14 @@ class SiteGroupForm extends Component {
         super(props);
         this.state = this.initialState;
         this.state = {
+            id: "",
+            name: "",
+            description: "",
             show: false,
         };
     }
+
+    formikRef = React.createRef();
 
     initialState = {
         id: "",
@@ -28,20 +37,27 @@ class SiteGroupForm extends Component {
         if (siteGroupId) {
             this.findSiteGroupById(siteGroupId);
         }
+        yup.setLocale(ru);
     }
 
     findSiteGroupById = (siteGroupId) => {
         this.props.fetchSiteGroup(siteGroupId);
-        let siteGroup = this.props.siteGroupObject.siteGroup;
-        // setTimeout(() => {
+        setTimeout(() => {
+            let siteGroup = this.props.siteGroupObject.siteGroup;
             if (siteGroup != null) {
                 this.setState({
                     id: siteGroup.id,
                     name: siteGroup.name,
                     description: siteGroup.description
                 });
+                this.formikRef.current.setValues({
+                        id: siteGroup.id,
+                        name: siteGroup.name,
+                        description: siteGroup.description
+                    }
+                )
             }
-        // }, 1000);
+        }, 300);
     };
 
     resetSiteGroup = () => {
@@ -51,35 +67,37 @@ class SiteGroupForm extends Component {
         } : this.initialState);
     };
 
-    submitSiteGroup = (event) => {
-        event.preventDefault();
-
+    submitSiteGroup = (values) => {
         const siteGroup = {
-            name: this.state.name,
-            description: this.state.description
+            name: values.name,
+            description: values.description
         };
 
         this.props.saveSiteGroup(siteGroup);
         setTimeout(() => {
-            if (this.props.siteGroupObject.siteGroup != null) {
+            const resp = this.props.siteGroupObject;
+            if (resp.siteGroup != null) {
                 this.setState({show: true, method: "post"});
                 setTimeout(() => {
                     this.setState({show: false})
                     this.siteGroupList();
-                }, 1500);
+                }, 2000);
+            } else if (resp.error) {
+                this.setState({error: resp.error.data.message})
+                setTimeout(() => {
+                    this.setState({error: null})
+                }, 3000);
             } else {
                 this.setState({show: false});
             }
         }, 500);
     };
 
-    updateSiteGroup = (event) => {
-        event.preventDefault();
-
+    updateSiteGroup = (values) => {
         const siteGroup = {
             id: this.state.id,
-            name: this.state.name,
-            description: this.state.description
+            name: values.name,
+            description: values.description
         };
         this.props.updateSiteGroup(siteGroup);
         setTimeout(() => {
@@ -88,25 +106,27 @@ class SiteGroupForm extends Component {
                 setTimeout(() => {
                     this.setState({show: false})
                     this.siteGroupList()
-                }, 1500);
+                }, 2000);
             } else {
                 this.setState({show: false});
             }
         }, 500);
     };
 
-    siteGroupChange = (event) => {
-        this.setState({
-            [event.target.name]: event.target.value,
-        });
-    };
-
     siteGroupList = () => {
         return this.props.history.push("/site-groups");
     };
 
+    schema = () => yup.object().shape({
+        name: yup.string().trim()
+            .required("Обязательное поле")
+            .min(4, "Должно быть минимум 4 символа")
+            .max(256, "Превышен лимит количества символов 256"),
+    });
+
     render() {
-        const {name, description} = this.state;
+        const {error} = this.state;
+        const {Formik} = formik;
 
         return (
             <div>
@@ -123,62 +143,93 @@ class SiteGroupForm extends Component {
                 </div>
                 <Card className={"border border-dark bg-dark text-white"}>
                     <Card.Header>
-                        <FontAwesomeIcon icon={this.state.id ? faEdit : faPlusSquare}/>{" "}
-                        {this.state.id ? "Редактировать группу" : "Добавить новую группу"}
+                        <div className={"content-header"}>
+                            <FontAwesomeIcon icon={this.state.id ? faEdit : faPlusSquare}/>{" "}
+                            {this.state.id ? "Редактировать группу" : "Добавить новую группу"}
+                        </div>
+                        {error && (
+                            <div className={"error-message"}>
+                                {error}
+                            </div>
+                        )}
                     </Card.Header>
-                    <Form
+                    <Formik
+                        initialValues={{
+                            name: "",
+                            description: ""
+                        }}
+                        innerRef={this.formikRef}
+                        validationSchema={this.schema()}
                         onReset={this.resetSiteGroup}
                         onSubmit={this.state.id ? this.updateSiteGroup : this.submitSiteGroup}
-                        id="siteGroupFormId"
                     >
-                        <Card.Body>
-                            <Form.Row>
-                                <Form.Group as={Col} controlId="formGridName">
-                                    <Form.Label>Название</Form.Label>
-                                    <Form.Control
-                                        required
-                                        autoComplete="off"
-                                        type="text"
-                                        name="name"
-                                        value={name}
-                                        onChange={this.siteGroupChange}
-                                        className={"bg-dark text-white"}
-                                        placeholder="Введите название группы"
-                                    />
-                                </Form.Group>
-                                <Form.Group as={Col} controlId="formGridDescription">
-                                    <Form.Label>Описание</Form.Label>
-                                    <Form.Control
-                                        required
-                                        autoComplete="off"
-                                        type="text"
-                                        name="description"
-                                        value={description}
-                                        onChange={this.siteGroupChange}
-                                        className={"bg-dark text-white"}
-                                        placeholder="Напишите описание группы"
-                                    />
-                                </Form.Group>
-                            </Form.Row>
-                        </Card.Body>
-                        <Card.Footer style={{textAlign: "right"}}>
-                            <Button size="sm" variant="success" type="submit">
-                                <FontAwesomeIcon icon={faSave}/>{" "}
-                                {this.state.id ? "Редактировать" : "Сохранить"}
-                            </Button>{" "}
-                            <Button size="sm" variant="info" type="reset">
-                                <FontAwesomeIcon icon={faUndo}/> Сбросить
-                            </Button>{" "}
-                            <Button
-                                size="sm"
-                                variant="info"
-                                type="button"
-                                onClick={() => this.siteGroupList()}
+                        {({handleSubmit, handleReset, handleChange, values, errors}) => (
+                            <Form
+                                onReset={handleReset}
+                                onSubmit={handleSubmit}
+                                noValidate
+                                id="siteGroupFormId"
                             >
-                                <FontAwesomeIcon icon={faList}/> Все группы
-                            </Button>
-                        </Card.Footer>
-                    </Form>
+                                <Card.Body>
+                                    <Form.Row>
+                                        <Form.Group as={Col} controlId="formGridName">
+                                            <Form.Label>Название</Form.Label>
+                                            <Form.Control
+                                                autoComplete="off"
+                                                readOnly={this.state.show}
+                                                type="text"
+                                                name="name"
+                                                value={values.name.trimStart()}
+                                                isInvalid={!!errors.name}
+                                                onChange={handleChange}
+                                                className={"bg-dark text-white"}
+                                                placeholder="Введите название группы"
+                                            />
+                                            <Form.Control.Feedback type="invalid">
+                                                {errors.name}
+                                            </Form.Control.Feedback>
+                                        </Form.Group>
+                                        <Form.Group as={Col} controlId="formGridDescription">
+                                            <Form.Label>Описание</Form.Label>
+                                            <Form.Control
+                                                as={"textarea"}
+                                                autoComplete="off"
+                                                readOnly={this.state.show}
+                                                type="text"
+                                                name="description"
+                                                value={values.description.trimStart()}
+                                                isInvalid={!!errors.description}
+                                                onChange={handleChange}
+                                                style={{height: "220px", resize: "none"}}
+                                                className={"bg-dark text-white"}
+                                                placeholder="Напишите описание"
+                                            />
+                                            <Form.Control.Feedback type="invalid">
+                                                {errors.description}
+                                            </Form.Control.Feedback>
+                                        </Form.Group>
+                                    </Form.Row>
+                                </Card.Body>
+                                <Card.Footer style={{textAlign: "right"}}>
+                                    <Button size="sm" variant="success" type="submit">
+                                        <FontAwesomeIcon icon={faSave}/>{" "}
+                                        {this.state.id ? "Редактировать" : "Сохранить"}
+                                    </Button>{" "}
+                                    <Button size="sm" variant="info" type="reset">
+                                        <FontAwesomeIcon icon={faUndo}/> Сбросить
+                                    </Button>{" "}
+                                    <Button
+                                        size="sm"
+                                        variant="info"
+                                        type="button"
+                                        onClick={() => this.siteGroupList()}
+                                    >
+                                        <FontAwesomeIcon icon={faList}/> Все группы
+                                    </Button>
+                                </Card.Footer>
+                            </Form>
+                        )}
+                    </Formik>
                 </Card>
             </div>
         );
