@@ -8,11 +8,11 @@ const initialState = {
 const reducer = (state = initialState, action) => {
     switch (action.type) {
         case SGT.SAVE_SITE_GROUP_REQUEST:
+        case SGT.ADD_SITES_TO_GROUP_REQUEST:
         case SGT.FETCH_SITE_GROUP_REQUEST:
         case SGT.UPDATE_SITE_GROUP_REQUEST:
         case SGT.DELETE_SITE_GROUP_REQUEST:
-            // case SGT.FETCH_LANGUAGES_REQUEST:
-            // case SGT.FETCH_GENRES_REQUEST:
+        case SGT.DELETE_SITES_OF_GROUP_REQUEST:
             return {
                 ...state,
             };

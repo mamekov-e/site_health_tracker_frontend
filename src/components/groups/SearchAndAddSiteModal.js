@@ -14,7 +14,7 @@ import {
 import {addSitesToGroup} from "../../services";
 import {connect} from "react-redux";
 import axios from "axios";
-import ToastMessage from "./ToastMessage";
+import ToastMessage from "../custom/ToastMessage";
 
 class SearchAndAddSiteModal extends Component {
     constructor(props) {
@@ -31,27 +31,25 @@ class SearchAndAddSiteModal extends Component {
         };
     }
 
-    addSitesToGroup = (siteToAdd) => {
+    addSitesToGroup = (site) => {
         let sites = []
-        sites.push(siteToAdd)
+        sites.push(site)
         console.log("Adding to group: ", sites)
 
         this.props.addSitesToGroup(this.state.siteGroupId, sites);
         setTimeout(() => {
-            const resp = this.props.siteObject;
-            console.log("resp ", resp)
-            if (resp.site) {
+            const resp = this.props.siteGroupObject;
+            console.log(this.props)
+            if (!resp.error) {
                 this.setState({show: true});
                 setTimeout(() => {
-                    this.setState({show: false, search: ""})
+                    this.setState({show: false, search: "", sites: []})
                 }, 2000);
-            } else if (resp.error) {
-                this.setState({error: resp.error.data.message})
-                setTimeout(() => {
-                    this.setState({error: null})
-                }, 3000);
             } else {
-                this.setState({show: false});
+                this.setState({error: resp.error.data.message, show: true})
+                setTimeout(() => {
+                    this.setState({show: false})
+                }, 3000);
             }
         }, 500);
     };
@@ -169,8 +167,9 @@ class SearchAndAddSiteModal extends Component {
                 <div style={{display: show ? "block" : "none"}}>
                     <ToastMessage
                         show={show}
-                        message={"Сайт успешно добавлен в группу."}
-                        type={"success"}
+                        error={"Ошибка"}
+                        message={error ? error : "Сайт успешно добавлен в группу."}
+                        type={error ? "danger" : "success"}
                     />
                 </div>
                 <Modal show={this.props.addSiteToGroupShow}
@@ -210,11 +209,6 @@ class SearchAndAddSiteModal extends Component {
                                 </InputGroup.Append>
                             </InputGroup>
                         </div>
-                        {error && (
-                            <div className={"error-message"}>
-                                {error}
-                            </div>
-                        )}
                     </Modal.Header>
                     <Modal.Body>
                         <Table bordered hover striped responsive={"md"} variant="dark">
@@ -344,7 +338,7 @@ class SearchAndAddSiteModal extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        siteObject: state.site,
+        siteGroupObject: state.siteGroup,
     };
 };
 

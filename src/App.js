@@ -11,7 +11,7 @@ import SiteGroupForm from "./components/groups/SiteGroupForm";
 import AllSitesPage from "./components/sites/AllSitesPage";
 import SitesOfGroup from "./components/groups/SitesOfGroupPage";
 import SearchAndAddSitePage from "./components/groups/SearchAndAddSitesPage";
-import SearchAndAddSiteModal from "./components/custom/SearchAndAddSiteModal";
+import SearchAndAddSiteModal from "./components/groups/SearchAndAddSiteModal";
 
 function App() {
     return (

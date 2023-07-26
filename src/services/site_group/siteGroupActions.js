@@ -1,6 +1,5 @@
 import * as SGT from "./siteGroupTypes";
 import axios from "axios";
-import {ADD_SITES_TO_GROUP_REQUEST, FETCH_SITE_GROUP_SITES_REQUEST} from "./siteGroupTypes";
 
 export const saveSiteGroup = (siteGroup) => {
     return (dispatch) => {
@@ -24,11 +23,13 @@ export const addSitesToGroup = (siteGroupId, sites) => {
             type: SGT.ADD_SITES_TO_GROUP_REQUEST,
         });
         axios
-            .post("http://localhost:8080/api/v1/site-groups/" + siteGroupId + "/sites", sites)
+            .post("http://localhost:8080/api/v1/site-groups/" + siteGroupId + "/sites/add", sites)
             .then((response) => {
+                console.log("dispatcher response", response)
                 dispatch(siteGroupSuccess(response.data));
             })
             .catch((error) => {
+                console.log("dispatcher err", error)
                 dispatch(siteGroupFailure(error));
             });
     };
@@ -105,7 +106,7 @@ export const deleteSitesOfGroup = (siteGroupId, sites) => {
             type: SGT.DELETE_SITES_OF_GROUP_REQUEST,
         });
         axios
-            .delete("http://localhost:8080/api/v1/site-groups/" + siteGroupId + "/sites", sites)
+            .post("http://localhost:8080/api/v1/site-groups/" + siteGroupId + "/sites/delete", sites)
             .then((response) => {
                 dispatch(siteGroupSuccess(response.data));
             })
@@ -125,6 +126,6 @@ const siteGroupSuccess = (siteGroup) => {
 const siteGroupFailure = (error) => {
     return {
         type: SGT.SITE_GROUP_FAILURE,
-        payload: error,
+        payload: error.response,
     };
 };

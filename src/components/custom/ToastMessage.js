@@ -27,7 +27,7 @@ const ToastMessage = (props) => {
                     }`}
                     closeButton={false}
                 >
-                    <strong className="mr-auto">Выполнено</strong>
+                    <strong className="mr-auto">{props.error ? props.error : "Выполнено"}</strong>
                 </Toast.Header>
                 <Toast.Body>{props.message}</Toast.Body>
             </Toast>

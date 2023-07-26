@@ -22,7 +22,7 @@ import {Link} from "react-router-dom";
 import ToastMessage from "../custom/ToastMessage";
 import axios from "axios";
 import {getGroupStatusBtnColor, getGroupStatusMsg} from "../../utils/statusConverter";
-import SearchAndAddSiteModal from "../custom/SearchAndAddSiteModal";
+import SearchAndAddSiteModal from "./SearchAndAddSiteModal";
 
 class SitesOfGroup extends Component {
     constructor(props) {
@@ -34,6 +34,7 @@ class SitesOfGroup extends Component {
                 status: "",
                 name: ""
             },
+            error: "",
             search: "",
             currentPage: 1,
             sitesPerPage: 5,
@@ -41,15 +42,6 @@ class SitesOfGroup extends Component {
             sortDir: "asc",
         };
     }
-
-    sortData = () => {
-        setTimeout(() => {
-            this.state.sortDir === "asc"
-                ? this.setState({sortDir: "desc"})
-                : this.setState({sortDir: "asc"});
-            this.findAllSites(this.state.currentPage);
-        }, 500);
-    };
 
     componentDidMount() {
         const siteGroupId = +this.props.match.params.id;
@@ -106,25 +98,32 @@ class SitesOfGroup extends Component {
         }, 300);
     };
 
-    deleteSitesOfGroup = (groupId, sites) => {
-        // this.props.deleteSitesOfGroup(groupId, sites);
-        // setTimeout(() => {
-        //     if (this.props.siteObject != null) {
-        //         this.setState({show: true});
-        //         setTimeout(() => {
-        //             this.setState({show: false});
-        //         }, 2000);
-        //         const currentPage = this.state.currentPage;
-        //         const siteGroupId = this.state.siteGroupId;
-        //         if (this.isLastElementOnPage() && currentPage !== 1) {
-        //             this.findAllGroupSitesById(currentPage - 1, siteGroupId);
-        //         } else {
-        //             this.findAllGroupSitesById(currentPage, siteGroupId);
-        //         }
-        //     } else {
-        //         this.setState({show: false});
-        //     }
-        // }, 500);
+    deleteSitesOfGroupById = (site) => {
+        let sites = []
+        sites.push(site)
+        const siteGroupId = this.state.siteGroupId;
+        this.props.deleteSitesOfGroup(siteGroupId, sites);
+        setTimeout(() => {
+            const resp = this.props.siteGroupObject;
+            console.log("resp",resp)
+            if (!resp.error) {
+                this.setState({show: true});
+                setTimeout(() => {
+                    this.setState({show: false});
+                }, 2000);
+                const currentPage = this.state.currentPage;
+                if (this.isLastElementOnPage() && currentPage !== 1) {
+                    this.findAllGroupSitesById(currentPage - 1, siteGroupId);
+                } else {
+                    this.findAllGroupSitesById(currentPage, siteGroupId);
+                }
+            } else {
+                this.setState({error: resp.error.data.message})
+                setTimeout(() => {
+                    this.setState({error: null})
+                }, 3000);
+            }
+        }, 500);
     };
 
     isLastElementOnPage() {
@@ -222,8 +221,10 @@ class SitesOfGroup extends Component {
         });
     };
 
-    cancelSearch = () => {
-        this.setState({search: ""});
+    refreshData = () => {
+        this.setState({search: "",
+            siteGroupStatus: getGroupStatusMsg(this.props.siteGroupObject.siteGroup),
+            siteGroupStatusBtnColor: getGroupStatusBtnColor(this.props.siteGroupObject.siteGroup) });
         this.findAllGroupSitesById(this.state.currentPage, this.state.siteGroupId);
     };
 
@@ -258,16 +259,14 @@ class SitesOfGroup extends Component {
         }
     }
 
-    handleModalShow = () => {
-        this.setState({addSiteToGroupShow: true})
-    }
-
     handleModalClose = () => {
         this.setState({addSiteToGroupShow: false})
+        this.refreshData()
     }
 
     render() {
-        const {sites, siteGroup, currentPage, totalPages, search, addSiteToGroupShow} = this.state;
+        const {sites, siteGroup, currentPage, totalPages, search,
+            addSiteToGroupShow, error} = this.state;
 
         return (
             <div>
@@ -282,6 +281,11 @@ class SitesOfGroup extends Component {
                     <SearchAndAddSiteModal handleModalClose={this.handleModalClose}
                                            addSiteToGroupShow={addSiteToGroupShow}
                                            siteGroupId={this.state.siteGroupId}/>
+                )}
+                {error && (
+                    <div className={"error-message"}>
+                        {error}
+                    </div>
                 )}
                 <Card className={"border border-dark bg-dark text-white"}>
                     <Card.Header>
@@ -315,7 +319,7 @@ class SitesOfGroup extends Component {
                                         variant="outline-danger"
                                         className={"m-1"}
                                         type="button"
-                                        onClick={this.cancelSearch}
+                                        onClick={this.refreshData}
                                     >
                                         <FontAwesomeIcon icon={faTimes}/>
                                     </Button>
@@ -334,29 +338,21 @@ class SitesOfGroup extends Component {
                             >
                                 Добавить сайт в группу
                             </Button>
-                            {/*<Link*/}
-                            {/*    to={"/site-groups/"+this.state.siteGroupId+"/sites/add"}*/}
-                            {/*    className="btn btn-sm btn-outline-light"*/}
-                            {/*>*/}
-                            {/*    Добавить сайт в группу*/}
-                            {/*</Link>*/}
                             <div style={{float: "right"}}>
-                                <Button
-                                    size={"sm"}
-                                    type="button"
-                                    variant={getGroupStatusBtnColor(siteGroup)}
-                                    style={{cursor: "default", pointerEvents: "none"}}
-                                >
-                                    {getGroupStatusMsg(siteGroup)}
-                                </Button>
+                                {/*<Button*/}
+                                {/*    size={"sm"}*/}
+                                {/*    type="button"*/}
+                                {/*    variant={siteGroupStatusBtnColor}*/}
+                                {/*    style={{cursor: "default", pointerEvents: "none"}}*/}
+                                {/*>*/}
+                                {/*    {siteGroupStatus}*/}
+                                {/*</Button>*/}
                                 <Button
                                     size="sm"
                                     variant="outline-info"
                                     className={"m-1"}
                                     type="button"
-                                    onClick={() => {
-                                        this.findAllGroupSitesById(currentPage, this.state.siteGroupId)
-                                    }}
+                                    onClick={this.refreshData}
                                 >
                                     Обновить <FontAwesomeIcon icon={faRedo}/>
                                 </Button>
@@ -399,7 +395,7 @@ class SitesOfGroup extends Component {
                                                 <Button
                                                     size="sm"
                                                     variant="outline-danger"
-                                                    onClick={() => this.deleteSitesOfGroup(site.id)}
+                                                    onClick={() => this.deleteSitesOfGroupById(site)}
                                                 >
                                                     <FontAwesomeIcon icon={faTrash}/>
                                                 </Button>
