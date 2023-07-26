@@ -26,6 +26,10 @@ class NavBar extends React.Component {
                               style={{color: '#F4EEE0'}}>
                             | Все группы |
                         </Link>
+                        <Link to={"/mailings"} className={"navbar-link text-decoration-none"}
+                              style={{color: '#F4EEE0'}}>
+                            | Уведомления |
+                        </Link>
                     </Nav>
                 </Container>
             </Navbar>

@@ -11,6 +11,7 @@ import {Button, Card, Col, Form} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit, faList, faPlusSquare, faSave, faUndo,} from "@fortawesome/free-solid-svg-icons";
 import ToastMessage from "../custom/ToastMessage";
+import {siteFormSchema} from "../../utils/yupSchemas";
 
 class SiteForm extends Component {
     constructor(props) {
@@ -112,12 +113,18 @@ class SiteForm extends Component {
         };
         this.props.updateSite(site);
         setTimeout(() => {
-            if (this.props.siteObject.site != null) {
+            const resp = this.props.siteObject;
+            if (resp.site) {
                 this.setState({show: true, method: "put"});
                 setTimeout(() => {
                     this.setState({show: false})
                     this.siteList();
                 }, 2000);
+            } else if (resp.error) {
+                this.setState({error: resp.error.data.message})
+                setTimeout(() => {
+                    this.setState({error: null})
+                }, 3000);
             } else {
                 this.setState({show: false});
             }
@@ -127,19 +134,6 @@ class SiteForm extends Component {
     siteList = () => {
         return this.props.history.push("/sites");
     };
-
-    schema = () => yup.object().shape({
-        name: yup.string().trim()
-            .required("Обязательное поле")
-            .min(4, "Должно быть минимум 4 символа")
-            .max(256, "Превышен лимит количества символов 256"),
-        url: yup.string()
-            .required("Обязательное поле")
-            .url("Неверный формат URL"),
-        siteHealthCheckInterval: yup.number().typeError("Введите числовое значение")
-            .positive("Значение интервала должно быть положительным")
-            .required("Обязательное поле"),
-    });
 
     render() {
         const {error} = this.state;
@@ -177,7 +171,7 @@ class SiteForm extends Component {
                             siteHealthCheckInterval: ""
                         }}
                         innerRef={this.formikRef}
-                        validationSchema={this.schema()}
+                        validationSchema={siteFormSchema}
                         onReset={this.resetSite}
                         onSubmit={this.state.id ? this.updateSite : this.submitSite}
                     >

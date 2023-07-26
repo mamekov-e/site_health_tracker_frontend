@@ -18,7 +18,6 @@ import {
     faTimes,
     faTrash,
 } from "@fortawesome/free-solid-svg-icons";
-import {Link} from "react-router-dom";
 import ToastMessage from "../custom/ToastMessage";
 import axios from "axios";
 import {getGroupStatusBtnColor, getGroupStatusMsg} from "../../utils/statusConverter";
@@ -105,7 +104,7 @@ class SitesOfGroup extends Component {
         this.props.deleteSitesOfGroup(siteGroupId, sites);
         setTimeout(() => {
             const resp = this.props.siteGroupObject;
-            console.log("resp",resp)
+            console.log("resp", resp)
             if (!resp.error) {
                 this.setState({show: true});
                 setTimeout(() => {
@@ -222,9 +221,11 @@ class SitesOfGroup extends Component {
     };
 
     refreshData = () => {
-        this.setState({search: "",
+        this.setState({
+            search: "",
             siteGroupStatus: getGroupStatusMsg(this.props.siteGroupObject.siteGroup),
-            siteGroupStatusBtnColor: getGroupStatusBtnColor(this.props.siteGroupObject.siteGroup) });
+            siteGroupStatusBtnColor: getGroupStatusBtnColor(this.props.siteGroupObject.siteGroup)
+        });
         this.findAllGroupSitesById(this.state.currentPage, this.state.siteGroupId);
     };
 
@@ -265,8 +266,10 @@ class SitesOfGroup extends Component {
     }
 
     render() {
-        const {sites, siteGroup, currentPage, totalPages, search,
-            addSiteToGroupShow, error} = this.state;
+        const {
+            sites, siteGroup, currentPage, totalPages, search,
+            addSiteToGroupShow, error
+        } = this.state;
 
         return (
             <div>
@@ -292,7 +295,8 @@ class SitesOfGroup extends Component {
                         <div className={"content-header"}>
                             <FontAwesomeIcon icon={faArrowLeft} onClick={this.props.history.goBack}
                                              style={{cursor: "pointer"}}/>
-                            <h6 style={{margin: 0}}>Список сайтов группы -  <span className={"text-light"}>{siteGroup.name}</span></h6>
+                            <h6 style={{margin: 0}}>Список сайтов группы - <span
+                                className={"text-light"}>{siteGroup.name}</span></h6>
                         </div>
                         <div style={{float: "right"}}>
                             <InputGroup size="sm">

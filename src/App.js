@@ -10,8 +10,8 @@ import SiteForm from "./components/sites/SiteForm";
 import SiteGroupForm from "./components/groups/SiteGroupForm";
 import AllSitesPage from "./components/sites/AllSitesPage";
 import SitesOfGroup from "./components/groups/SitesOfGroupPage";
-import SearchAndAddSitePage from "./components/groups/SearchAndAddSitesPage";
 import SearchAndAddSiteModal from "./components/groups/SearchAndAddSiteModal";
+import MailingPage from "./components/mailings/MailingPage";
 
 function App() {
     return (
@@ -30,6 +30,7 @@ function App() {
                             <Route path="/site-groups/:id/sites/add" exact component={SearchAndAddSiteModal}/>
                             <Route path="/site-groups/add" exact component={SiteGroupForm}/>
                             <Route path="/site-groups/edit/:id" exact component={SiteGroupForm}/>
+                            <Route path="/mailings" exact component={MailingPage}/>
                         </Switch>
                     </Col>
                 </Row>

@@ -11,6 +11,7 @@ import {Button, Card, Col, Form} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit, faList, faPlusSquare, faSave, faUndo,} from "@fortawesome/free-solid-svg-icons";
 import ToastMessage from "../custom/ToastMessage";
+import {siteGroupFormSchema} from "../../utils/yupSchemas";
 
 class SiteGroupForm extends Component {
     constructor(props) {
@@ -101,12 +102,18 @@ class SiteGroupForm extends Component {
         };
         this.props.updateSiteGroup(siteGroup);
         setTimeout(() => {
-            if (this.props.siteGroupObject.siteGroup != null) {
+            const resp = this.props.siteGroupObject
+            if (resp.siteGroup != null) {
                 this.setState({show: true, method: "put"});
                 setTimeout(() => {
                     this.setState({show: false})
                     this.siteGroupList()
                 }, 2000);
+            } else if (resp.error) {
+                this.setState({error: resp.error.data.message})
+                setTimeout(() => {
+                    this.setState({error: null})
+                }, 3000);
             } else {
                 this.setState({show: false});
             }
@@ -116,13 +123,6 @@ class SiteGroupForm extends Component {
     siteGroupList = () => {
         return this.props.history.push("/site-groups");
     };
-
-    schema = () => yup.object().shape({
-        name: yup.string().trim()
-            .required("Обязательное поле")
-            .min(4, "Должно быть минимум 4 символа")
-            .max(256, "Превышен лимит количества символов 256"),
-    });
 
     render() {
         const {error} = this.state;
@@ -159,7 +159,7 @@ class SiteGroupForm extends Component {
                             description: ""
                         }}
                         innerRef={this.formikRef}
-                        validationSchema={this.schema()}
+                        validationSchema={siteGroupFormSchema}
                         onReset={this.resetSiteGroup}
                         onSubmit={this.state.id ? this.updateSiteGroup : this.submitSiteGroup}
                     >

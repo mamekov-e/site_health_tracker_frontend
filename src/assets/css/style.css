@@ -40,6 +40,16 @@
     z-index: 9999; /* Устанавливаем высокий z-index, чтобы сообщение было поверх остальных элементов */
 }
 
+.checkbox-style {
+    font-size: 25px;
+    height: 100%;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
 table {
     table-layout: fixed;
 }
