@@ -42,6 +42,7 @@ class SiteForm extends Component {
     };
 
     submitEmail = async (values) => {
+        this.setState({submitClicked: true})
         const email = {
             "email-address": values.email
         };
@@ -55,12 +56,12 @@ class SiteForm extends Component {
         if (resp.email) {
             this.setState({show: true});
             setTimeout(() => {
-                this.setState({email: "", show: false})
+                this.setState({email: "", show: false, submitClicked: false})
             }, 2000);
         } else if (resp.error) {
             this.setState({error: resp.error.data.message})
             setTimeout(() => {
-                this.setState({error: null})
+                this.setState({error: null, submitClicked: false})
             }, 3000);
         }
     };
@@ -72,7 +73,7 @@ class SiteForm extends Component {
     }
 
     render() {
-        const {error, subscribe, show} = this.state;
+        const {error, subscribe, show, submitClicked} = this.state;
         const {Formik} = formik;
         return (
             <div>
@@ -139,7 +140,7 @@ class SiteForm extends Component {
                                                     checked={subscribe}
                                                     className={"checkbox-style"}
                                                     onChange={this.handleSubscribe}
-                                                    disabled={show || error}
+                                                    disabled={submitClicked}
                                                 />
                                             </Form.Group>
                                         </div>

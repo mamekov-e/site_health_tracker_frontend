@@ -3,18 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="bb72b985-888c-4c91-b6fa-8ad20ebd803e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Welcome.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/groups/AllSiteGroupsPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/groups/AllSiteGroupsPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/groups/SearchAndAddSiteModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/groups/SearchAndAddSiteModal.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/groups/SiteGroupForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/groups/SiteGroupForm.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/groups/SitesOfGroupPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/groups/SitesOfGroupPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/mailings/MailingPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/mailings/MailingPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/sites/AllSitesPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sites/AllSitesPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/sites/SiteCheckLogsModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sites/SiteCheckLogsModal.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/sites/SiteForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sites/SiteForm.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/email/emailActions.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/email/emailActions.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/site/siteActions.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/site/siteActions.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/site_group/siteGroupActions.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/site_group/siteGroupActions.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -90,7 +80,7 @@
       <workItem from="1689936811352" duration="152000" />
       <workItem from="1689937028759" duration="32132000" />
       <workItem from="1690026411587" duration="52063000" />
-      <workItem from="1690169447651" duration="109496000" />
+      <workItem from="1690169447651" duration="112224000" />
     </task>
     <servers />
   </component>

@@ -74,6 +74,7 @@ class SiteForm extends Component {
     };
 
     submitSite = async (values) => {
+        this.setState({submitClicked: true})
         const siteId = this.state.id;
         const site = {
             id: siteId,
@@ -92,16 +93,16 @@ class SiteForm extends Component {
         if (resp.site) {
             this.setState({show: true, method: siteId ? "put" : "post"});
             setTimeout(() => {
-                this.setState({show: false})
+                this.setState({show: false, submitClicked: false})
                 this.siteList()
             }, 2000);
         } else if (resp.error) {
             this.setState({error: resp.error.data.message})
             setTimeout(() => {
-                this.setState({error: null})
+                this.setState({error: null, submitClicked: false})
             }, 3000);
         } else {
-            this.setState({show: false});
+            this.setState({show: false, submitClicked: false});
         }
     };
 
@@ -110,7 +111,7 @@ class SiteForm extends Component {
     };
 
     render() {
-        const {error} = this.state;
+        const {error,submitClicked} = this.state;
         const {Formik} = formik;
         return (
             <div>
@@ -172,6 +173,7 @@ class SiteForm extends Component {
                                                 onChange={handleChange}
                                                 className={"bg-dark text-white"}
                                                 placeholder="Введите название"
+                                                disabled={submitClicked}
                                             />
                                             <Form.Control.Feedback type="invalid">
                                                 {errors.name}
@@ -189,6 +191,7 @@ class SiteForm extends Component {
                                                 onChange={handleChange}
                                                 className={"bg-dark text-white"}
                                                 placeholder="Введите URL"
+                                                disabled={submitClicked}
                                             />
                                             <Form.Control.Feedback type="invalid">
                                                 {errors.url}
@@ -206,6 +209,7 @@ class SiteForm extends Component {
                                                 onChange={handleChange}
                                                 className={"bg-dark text-white"}
                                                 placeholder="Введите периодичность"
+                                                disabled={submitClicked}
                                             />
                                             <Form.Control.Feedback type="invalid">
                                                 {errors.siteHealthCheckInterval}
@@ -227,6 +231,7 @@ class SiteForm extends Component {
                                                 style={{height: "220px", resize: "none"}}
                                                 className={"bg-dark text-white"}
                                                 placeholder="Напишите описание"
+                                                disabled={submitClicked}
                                             />
                                             <Form.Control.Feedback type="invalid">
                                                 {errors.description}
@@ -235,11 +240,11 @@ class SiteForm extends Component {
                                     </Form.Row>
                                 </Card.Body>
                                 <Card.Footer style={{textAlign: "right"}}>
-                                    <Button size="sm" variant="success" type="submit">
+                                    <Button size="sm" variant="success" type="submit" disabled={submitClicked}>
                                         <FontAwesomeIcon icon={faSave}/>{" "}
                                         {this.state.id ? "Редактировать" : "Сохранить"}
                                     </Button>{" "}
-                                    <Button size="sm" variant="info" type="reset">
+                                    <Button size="sm" variant="info" type="reset" disabled={submitClicked}>
                                         <FontAwesomeIcon icon={faUndo}/> Сбросить
                                     </Button>
                                 </Card.Footer>

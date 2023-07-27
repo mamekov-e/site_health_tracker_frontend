@@ -67,6 +67,7 @@ class SiteGroupForm extends Component {
     };
 
     submitSiteGroup = async (values) => {
+        this.setState({submitClicked: true})
         const siteGroupId = this.state.id;
         const siteGroup = {
             id: siteGroupId,
@@ -82,16 +83,16 @@ class SiteGroupForm extends Component {
         if (resp.siteGroup != null) {
             this.setState({show: true, method: siteGroupId ? "put" : "post"});
             setTimeout(() => {
-                this.setState({show: false})
+                this.setState({show: false, submitClicked: false})
                 this.siteGroupList();
             }, 2000);
         } else if (resp.error) {
             this.setState({error: resp.error.data.message})
             setTimeout(() => {
-                this.setState({error: null})
+                this.setState({error: null, submitClicked: false})
             }, 3000);
         } else {
-            this.setState({show: false});
+            this.setState({show: false, submitClicked: false});
         }
     };
 
@@ -100,7 +101,7 @@ class SiteGroupForm extends Component {
     };
 
     render() {
-        const {error} = this.state;
+        const {error, submitClicked} = this.state;
         const {Formik} = formik;
 
         return (
@@ -161,6 +162,7 @@ class SiteGroupForm extends Component {
                                                 onChange={handleChange}
                                                 className={"bg-dark text-white"}
                                                 placeholder="Введите название группы"
+                                                disabled={submitClicked}
                                             />
                                             <Form.Control.Feedback type="invalid">
                                                 {errors.name}
@@ -180,6 +182,7 @@ class SiteGroupForm extends Component {
                                                 style={{height: "220px", resize: "none"}}
                                                 className={"bg-dark text-white"}
                                                 placeholder="Напишите описание"
+                                                disabled={submitClicked}
                                             />
                                             <Form.Control.Feedback type="invalid">
                                                 {errors.description}
@@ -188,11 +191,11 @@ class SiteGroupForm extends Component {
                                     </Form.Row>
                                 </Card.Body>
                                 <Card.Footer style={{textAlign: "right"}}>
-                                    <Button size="sm" variant="success" type="submit">
+                                    <Button size="sm" variant="success" type="submit" disabled={submitClicked}>
                                         <FontAwesomeIcon icon={faSave}/>{" "}
                                         {this.state.id ? "Редактировать" : "Сохранить"}
                                     </Button>{" "}
-                                    <Button size="sm" variant="info" type="reset">
+                                    <Button size="sm" variant="info" type="reset" disabled={submitClicked}>
                                         <FontAwesomeIcon icon={faUndo}/> Сбросить
                                     </Button>
                                 </Card.Footer>

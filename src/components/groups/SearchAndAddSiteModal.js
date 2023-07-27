@@ -58,6 +58,8 @@ class SearchAndAddSiteModal extends Component {
     }
 
     addSitesToGroup = async (site) => {
+        this.setState({submitClicked: true})
+
         let sites = []
         sites.push(site)
 
@@ -66,12 +68,12 @@ class SearchAndAddSiteModal extends Component {
         if (!resp.error) {
             this.setState({show: true});
             setTimeout(() => {
-                this.setState({show: false})
+                this.setState({show: false, submitClicked: false})
             }, 2000);
         } else {
             this.setState({error: resp.error.data.message, show: true})
             setTimeout(() => {
-                this.setState({show: false})
+                this.setState({show: false, submitClicked: false})
             }, 3000);
         }
     };
@@ -191,7 +193,7 @@ class SearchAndAddSiteModal extends Component {
     }
 
     render() {
-        const {sites, currentPage, totalPages, search, error, show} = this.state;
+        const {sites, currentPage, totalPages, search, error, show, submitClicked} = this.state;
         return (
             <>
                 <div style={{display: show ? "block" : "none"}}>
@@ -220,6 +222,7 @@ class SearchAndAddSiteModal extends Component {
                                     value={search}
                                     className={"info-border bg-dark text-white m-1"}
                                     onChange={this.searchChange}
+                                    disabled={submitClicked}
                                 />
                                 <InputGroup.Append>
                                     <Button
@@ -227,6 +230,7 @@ class SearchAndAddSiteModal extends Component {
                                         variant="outline-info"
                                         className={"m-1"}
                                         type="button"
+                                        disabled={submitClicked}
                                         onClick={async () => {
                                             await this.searchData()
                                         }}
@@ -238,6 +242,7 @@ class SearchAndAddSiteModal extends Component {
                                         variant="outline-danger"
                                         className={"m-1"}
                                         type="button"
+                                        disabled={submitClicked}
                                         onClick={this.refreshSearch}
                                     >
                                         <FontAwesomeIcon icon={faTimes}/>
@@ -285,7 +290,7 @@ class SearchAndAddSiteModal extends Component {
                                                 <Button
                                                     size="sm"
                                                     variant="primary"
-                                                    disabled={show}
+                                                    disabled={submitClicked}
                                                     onClick={async () => {
                                                         await this.addSitesToGroup(site)
                                                     }}
