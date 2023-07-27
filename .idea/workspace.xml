@@ -2,14 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="bb72b985-888c-4c91-b6fa-8ad20ebd803e" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/assets/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/assets/css/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/groups/SearchAndAddSiteModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/groups/SearchAndAddSiteModal.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/groups/SitesOfGroupPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/groups/SitesOfGroupPage.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/sites/AllSitesPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sites/AllSitesPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/statusConverter.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/statusConverter.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sites/SiteCheckLogsModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sites/SiteCheckLogsModal.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,7 +80,7 @@
       <workItem from="1689936811352" duration="152000" />
       <workItem from="1689937028759" duration="32132000" />
       <workItem from="1690026411587" duration="52063000" />
-      <workItem from="1690169447651" duration="98853000" />
+      <workItem from="1690169447651" duration="99283000" />
     </task>
     <servers />
   </component>

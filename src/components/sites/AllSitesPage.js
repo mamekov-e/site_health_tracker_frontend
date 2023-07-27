@@ -352,7 +352,7 @@ class AllSitesPage extends Component {
                                                 {siteCheckModalShow && (
                                                     <SiteCheckLogsModal handleModalClose={this.handleModalClose}
                                                                         siteCheckModalShow={siteCheckModalShow}
-                                                                        siteId={site.id}/>
+                                                                        site={site}/>
                                                 )}
                                             </ButtonGroup>
                                         </td>

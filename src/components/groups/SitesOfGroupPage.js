@@ -418,7 +418,7 @@ class SitesOfGroup extends Component {
                                                 {siteCheckModalShow && (
                                                     <SiteCheckLogsModal handleModalClose={this.refreshData}
                                                                         siteCheckModalShow={siteCheckModalShow}
-                                                                        siteId={site.id}/>
+                                                                        site={site}/>
                                                 )}
                                             </ButtonGroup>
                                         </td>

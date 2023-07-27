@@ -18,7 +18,7 @@ ChartJS.register(
     Tooltip,
     Legend);
 
-const SiteCheckLogsModal = ({handleModalClose, siteCheckModalShow, siteId}) => {
+const SiteCheckLogsModal = ({handleModalClose, siteCheckModalShow, site}) => {
     const [selectedDate, setSelectedDate] = useState(getTodayDate());
     const [chartData, setChartData] = useState({
         labels: [],
@@ -48,7 +48,7 @@ const SiteCheckLogsModal = ({handleModalClose, siteCheckModalShow, siteId}) => {
     }
 
     useEffect(() => {
-        if (siteId) {
+        if (site.id) {
             findAllSiteCheckLogsByDate(selectedDate)
         }
     }, [])
@@ -56,7 +56,7 @@ const SiteCheckLogsModal = ({handleModalClose, siteCheckModalShow, siteId}) => {
     const findAllSiteCheckLogsByDate = async (date) => {
         try {
             const response = await axios.get(
-                `http://localhost:8080/api/v1/site-check-logs/${siteId}?date=${date}`
+                `http://localhost:8080/api/v1/site-check-logs/${site.id}?date=${date}`
             );
             const data = response.data;
 
@@ -139,7 +139,7 @@ const SiteCheckLogsModal = ({handleModalClose, siteCheckModalShow, siteId}) => {
                    dialogClassName={"my-modal text-light"}
                    onHide={handleModalClose}>
                 <Modal.Header className={"modal-content flex-row"}>
-                    <Modal.Title>История проверки сайта на доступность</Modal.Title>
+                    <Modal.Title>История проверки сайта на доступность | {site.name}</Modal.Title>
                     <Button variant="secondary" className={"float-right"} onClick={handleModalClose}>
                         Закрыть
                     </Button>
