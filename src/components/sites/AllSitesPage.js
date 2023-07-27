@@ -11,7 +11,8 @@ import {
     faExternalLinkAlt,
     faFastBackward,
     faFastForward,
-    faList, faRedo,
+    faList,
+    faRedo,
     faSearch,
     faStepBackward,
     faStepForward,
@@ -21,6 +22,7 @@ import {
 import {Link} from "react-router-dom";
 import ToastMessage from "../custom/ToastMessage";
 import axios from "axios";
+import SiteCheckLogsModal from "./SiteCheckLogsModal";
 
 class AllSitesPage extends Component {
     constructor(props) {
@@ -32,17 +34,9 @@ class AllSitesPage extends Component {
             sitesPerPage: 5,
             pageNumbers: [{value: 1, display: 1}],
             sortDir: "asc",
+            siteCheckModalShow: false
         };
     }
-
-    sortData = () => {
-        setTimeout(() => {
-            this.state.sortDir === "asc"
-                ? this.setState({sortDir: "desc"})
-                : this.setState({sortDir: "asc"});
-            this.findAllSites(this.state.currentPage);
-        }, 500);
-    };
 
     componentDidMount() {
         this.findAllSites(this.state.currentPage);
@@ -189,7 +183,7 @@ class AllSitesPage extends Component {
         });
     };
 
-    cancelSearch = () => {
+    refreshPage = () => {
         this.setState({search: ""});
         this.findAllSites(this.state.currentPage);
     };
@@ -221,8 +215,13 @@ class AllSitesPage extends Component {
         }
     }
 
+    handleModalClose = () => {
+        this.setState({siteCheckModalShow: false})
+        this.refreshPage()
+    }
+
     render() {
-        const {sites, currentPage, totalPages, search} = this.state;
+        const {sites, currentPage, totalPages, search, siteCheckModalShow} = this.state;
 
         return (
             <div>
@@ -264,7 +263,7 @@ class AllSitesPage extends Component {
                                         variant="outline-danger"
                                         className={"m-1"}
                                         type="button"
-                                        onClick={this.cancelSearch}
+                                        onClick={this.refreshPage}
                                     >
                                         <FontAwesomeIcon icon={faTimes}/>
                                     </Button>
@@ -281,12 +280,14 @@ class AllSitesPage extends Component {
                                 Добавить сайт
                             </Link>
                             <Button
-                                style={{float:"right"}}
+                                style={{float: "right"}}
                                 size="sm"
                                 variant="outline-info"
                                 className={"m-1"}
                                 type="button"
-                                onClick={()=>{this.findAllSites(currentPage)}}
+                                onClick={() => {
+                                    this.findAllSites(currentPage)
+                                }}
                             >
                                 Обновить <FontAwesomeIcon icon={faRedo}/>
                             </Button>
@@ -299,18 +300,6 @@ class AllSitesPage extends Component {
                                 <th>URL</th>
                                 <th>Статус</th>
                                 <th>Периодичность</th>
-                                {/*<th onClick={this.state.sites.length ? this.sortData : null}>*/}
-                                {/*    Периодичность{" "}*/}
-                                {/*    <div*/}
-                                {/*        className={*/}
-                                {/*            this.state.sortDir === "asc"*/}
-                                {/*                ? "arrow arrow-up"*/}
-                                {/*                : "arrow arrow-down"*/}
-                                {/*        }*/}
-                                {/*    >*/}
-                                {/*        {" "}*/}
-                                {/*    </div>*/}
-                                {/*</th>*/}
                                 <th>Действия</th>
                             </tr>
                             </thead>
@@ -355,10 +344,16 @@ class AllSitesPage extends Component {
                                                     size="sm"
                                                     variant="outline-warning"
                                                     onClick={() => {
+                                                        this.setState({siteCheckModalShow: true})
                                                     }}
                                                 >
                                                     <FontAwesomeIcon icon={faExternalLinkAlt}/>
                                                 </Button>
+                                                {siteCheckModalShow && (
+                                                    <SiteCheckLogsModal handleModalClose={this.handleModalClose}
+                                                                        siteCheckModalShow={siteCheckModalShow}
+                                                                        siteId={site.id}/>
+                                                )}
                                             </ButtonGroup>
                                         </td>
                                     </tr>

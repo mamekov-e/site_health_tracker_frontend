@@ -21,3 +21,7 @@ export const getGroupStatusBtnColor = (siteGroup) => {
         return "secondary"
     }
 }
+
+export const convertStatusesToBinaryArr = (data) => {
+    return data.map(item => item.status === "UP" ? 1 : 0)
+}

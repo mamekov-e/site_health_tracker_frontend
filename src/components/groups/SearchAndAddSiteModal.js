@@ -167,7 +167,7 @@ class SearchAndAddSiteModal extends Component {
                 <div style={{display: show ? "block" : "none"}}>
                     <ToastMessage
                         show={show}
-                        error={"Ошибка"}
+                        error={error ? "Ошибка" : null}
                         message={error ? error : "Сайт успешно добавлен в группу."}
                         type={error ? "danger" : "success"}
                     />

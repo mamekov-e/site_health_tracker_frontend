@@ -22,6 +22,7 @@ import ToastMessage from "../custom/ToastMessage";
 import axios from "axios";
 import {getGroupStatusBtnColor, getGroupStatusMsg} from "../../utils/statusConverter";
 import SearchAndAddSiteModal from "./SearchAndAddSiteModal";
+import SiteCheckLogsModal from "../sites/SiteCheckLogsModal";
 
 class SitesOfGroup extends Component {
     constructor(props) {
@@ -39,6 +40,7 @@ class SitesOfGroup extends Component {
             sitesPerPage: 5,
             pageNumbers: [{value: 1, display: 1}],
             sortDir: "asc",
+            siteCheckModalShow: false
         };
     }
 
@@ -224,7 +226,8 @@ class SitesOfGroup extends Component {
         this.setState({
             search: "",
             siteGroupStatus: getGroupStatusMsg(this.props.siteGroupObject.siteGroup),
-            siteGroupStatusBtnColor: getGroupStatusBtnColor(this.props.siteGroupObject.siteGroup)
+            siteGroupStatusBtnColor: getGroupStatusBtnColor(this.props.siteGroupObject.siteGroup),
+            siteCheckModalShow: false
         });
         this.findAllGroupSitesById(this.state.currentPage, this.state.siteGroupId);
     };
@@ -268,7 +271,7 @@ class SitesOfGroup extends Component {
     render() {
         const {
             sites, siteGroup, currentPage, totalPages, search,
-            addSiteToGroupShow, error
+            addSiteToGroupShow, error, siteCheckModalShow
         } = this.state;
 
         return (
@@ -407,10 +410,16 @@ class SitesOfGroup extends Component {
                                                     size="sm"
                                                     variant="outline-warning"
                                                     onClick={() => {
+                                                        this.setState({siteCheckModalShow: true})
                                                     }}
                                                 >
                                                     <FontAwesomeIcon icon={faExternalLinkAlt}/>
                                                 </Button>
+                                                {siteCheckModalShow && (
+                                                    <SiteCheckLogsModal handleModalClose={this.refreshData}
+                                                                        siteCheckModalShow={siteCheckModalShow}
+                                                                        siteId={site.id}/>
+                                                )}
                                             </ButtonGroup>
                                         </td>
                                     </tr>
