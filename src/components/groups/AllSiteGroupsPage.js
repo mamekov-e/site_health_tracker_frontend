@@ -64,11 +64,12 @@ class AllSiteGroupsPage extends Component {
     }
 
     deleteSiteGroup = async (siteGroupId) => {
+        this.setState({deleteClicked: true})
         await this.props.deleteSiteGroup(siteGroupId);
         if (this.props.siteGroupObject != null) {
             this.setState({show: true});
             setTimeout(() => {
-                this.setState({show: false})
+                this.setState({show: false, deleteClicked: false})
             }, 2000);
             if (this.isLastElementOnPage() && this.state.currentPage !== 1) {
                 await this.findAllSiteGroups(this.state.currentPage - 1);
@@ -76,7 +77,7 @@ class AllSiteGroupsPage extends Component {
                 await this.findAllSiteGroups(this.state.currentPage);
             }
         } else {
-            this.setState({show: false});
+            this.setState({show: false, deleteClicked: false});
         }
     };
 
@@ -208,7 +209,7 @@ class AllSiteGroupsPage extends Component {
     };
 
     render() {
-        const {siteGroups, currentPage, totalPages, search} = this.state;
+        const {siteGroups, currentPage, totalPages, search, deleteClicked} = this.state;
 
         return (
             <div>
@@ -231,6 +232,7 @@ class AllSiteGroupsPage extends Component {
                                     style={{width: "250px", textColor: "blue"}}
                                     placeholder="Поиск"
                                     name="search"
+                                    disabled={deleteClicked}
                                     value={search}
                                     className={"info-border bg-dark text-white m-1"}
                                     onChange={this.searchChange}
@@ -241,6 +243,7 @@ class AllSiteGroupsPage extends Component {
                                         variant="outline-info"
                                         type="button"
                                         className={"m-1"}
+                                        disabled={deleteClicked}
                                         onClick={this.searchData}
                                     >
                                         <FontAwesomeIcon icon={faSearch}/>
@@ -250,6 +253,7 @@ class AllSiteGroupsPage extends Component {
                                         variant="outline-danger"
                                         className={"m-1"}
                                         type="button"
+                                        disabled={deleteClicked}
                                         onClick={this.refreshPage}
                                     >
                                         <FontAwesomeIcon icon={faTimes}/>
@@ -262,7 +266,7 @@ class AllSiteGroupsPage extends Component {
                         <div className={"mb-3"}>
                             <Link
                                 to={"site-groups/add/"}
-                                className="btn btn-sm btn-outline-light"
+                                className={`btn btn-sm btn-outline-light ${deleteClicked ? "disabled" : ""} `}
                             >
                                 Добавить группу
                             </Link>
@@ -272,6 +276,7 @@ class AllSiteGroupsPage extends Component {
                                 variant="outline-info"
                                 className={"m-1"}
                                 type="button"
+                                disabled={deleteClicked}
                                 onClick={async () => {
                                     await this.findAllSiteGroups(currentPage)
                                 }}
@@ -312,20 +317,21 @@ class AllSiteGroupsPage extends Component {
                                             <ButtonGroup className={"d-flex gap-2"}>
                                                 <Link
                                                     to={"site-groups/edit/" + siteGroup.id}
-                                                    className="btn btn-sm btn-outline-primary"
+                                                    className={`btn btn-sm btn-outline-primary ${deleteClicked ? "disabled" : ""} `}
                                                 >
                                                     <FontAwesomeIcon icon={faEdit}/>
                                                 </Link>
                                                 <Button
                                                     size="sm"
                                                     variant="outline-danger"
+                                                    disabled={deleteClicked}
                                                     onClick={() => this.deleteSiteGroup(siteGroup.id)}
                                                 >
                                                     <FontAwesomeIcon icon={faTrash}/>
                                                 </Button>
                                                 <Link
                                                     to={"site-groups/" + siteGroup.id + "/sites"}
-                                                    className="btn btn-sm btn-outline-warning"
+                                                    className={`btn btn-sm btn-outline-warning ${deleteClicked ? "disabled" : ""} `}
                                                 >
                                                     <FontAwesomeIcon icon={faExternalLinkAlt}/>
                                                 </Link>
@@ -348,7 +354,7 @@ class AllSiteGroupsPage extends Component {
                                         <Button
                                             type="button"
                                             variant="outline-info"
-                                            disabled={currentPage === 1 ? true : false}
+                                            disabled={currentPage === 1 || deleteClicked}
                                             onClick={this.firstPage}
                                         >
                                             <FontAwesomeIcon icon={faFastBackward}/> Первая
@@ -356,7 +362,7 @@ class AllSiteGroupsPage extends Component {
                                         <Button
                                             type="button"
                                             variant="outline-info"
-                                            disabled={currentPage === 1 ? true : false}
+                                            disabled={currentPage === 1 || deleteClicked}
                                             onClick={this.prevPage}
                                         >
                                             <FontAwesomeIcon icon={faStepBackward}/> Предыдущая
@@ -369,6 +375,7 @@ class AllSiteGroupsPage extends Component {
                                         style={{minWidth: "60px"}}
                                         name="currentPage"
                                         value={currentPage}
+                                        disabled={deleteClicked}
                                         onChange={this.changePage}
                                     >
                                         {this.state.pageNumbers.map((pageNumber) => (
@@ -381,7 +388,7 @@ class AllSiteGroupsPage extends Component {
                                         <Button
                                             type="button"
                                             variant="outline-info"
-                                            disabled={currentPage === totalPages ? true : false}
+                                            disabled={currentPage === totalPages || deleteClicked}
                                             onClick={this.nextPage}
                                         >
                                             Следующая <FontAwesomeIcon icon={faStepForward}/>
@@ -389,7 +396,7 @@ class AllSiteGroupsPage extends Component {
                                         <Button
                                             type="button"
                                             variant="outline-info"
-                                            disabled={currentPage === totalPages ? true : false}
+                                            disabled={currentPage === totalPages || deleteClicked}
                                             onClick={this.lastPage}
                                         >
                                             Последняя <FontAwesomeIcon icon={faFastForward}/>

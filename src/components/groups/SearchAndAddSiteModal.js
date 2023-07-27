@@ -210,7 +210,9 @@ class SearchAndAddSiteModal extends Component {
                     <Modal.Header className={"modal-content"}>
                         <div style={{width: "100%", display: "flex", justifyContent: "flex-end"}}>
                             <Modal.Title className={"text-light"} style={{width: "60%"}}>Поиск сайтов для добавления</Modal.Title>
-                            <Button variant={"secondary"} style={{float: "right"}}
+                            <Button variant={"secondary"}
+                                    style={{float: "right"}}
+                                    disabled={submitClicked}
                                     onClick={this.props.handleModalClose}>Закрыть</Button>
                         </div>
                         <div style={{display: "flex", justifyContent: "center", width: "100%"}}>
@@ -313,7 +315,7 @@ class SearchAndAddSiteModal extends Component {
                                         <Button
                                             type="button"
                                             variant="outline-info"
-                                            disabled={currentPage === 1 ? true : false}
+                                            disabled={currentPage === 1 || submitClicked}
                                             onClick={this.firstPage}
                                         >
                                             <FontAwesomeIcon icon={faFastBackward}/> Первая
@@ -321,7 +323,7 @@ class SearchAndAddSiteModal extends Component {
                                         <Button
                                             type="button"
                                             variant="outline-info"
-                                            disabled={currentPage === 1 ? true : false}
+                                            disabled={currentPage === 1 || submitClicked}
                                             onClick={this.prevPage}
                                         >
                                             <FontAwesomeIcon icon={faStepBackward}/> Предыдущая
@@ -334,6 +336,7 @@ class SearchAndAddSiteModal extends Component {
                                         style={{minWidth: "60px"}}
                                         name="currentPage"
                                         value={currentPage}
+                                        disabled={submitClicked}
                                         onChange={this.changePage}
                                     >
                                         {this.state.pageNumbers.map((pageNumber) => (
@@ -346,7 +349,7 @@ class SearchAndAddSiteModal extends Component {
                                         <Button
                                             type="button"
                                             variant="outline-info"
-                                            disabled={currentPage === totalPages ? true : false}
+                                            disabled={currentPage === totalPages || submitClicked}
                                             onClick={this.nextPage}
                                         >
                                             Следующая <FontAwesomeIcon icon={faStepForward}/>
@@ -354,7 +357,7 @@ class SearchAndAddSiteModal extends Component {
                                         <Button
                                             type="button"
                                             variant="outline-info"
-                                            disabled={currentPage === totalPages ? true : false}
+                                            disabled={currentPage === totalPages || submitClicked}
                                             onClick={this.lastPage}
                                         >
                                             Последняя <FontAwesomeIcon icon={faFastForward}/>

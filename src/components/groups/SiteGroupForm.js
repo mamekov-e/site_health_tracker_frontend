@@ -80,7 +80,7 @@ class SiteGroupForm extends Component {
             await this.props.saveSiteGroup(siteGroup);
         }
         const resp = this.props.siteGroupObject;
-        if (resp.siteGroup != null) {
+        if (resp.siteGroup) {
             this.setState({show: true, method: siteGroupId ? "put" : "post"});
             setTimeout(() => {
                 this.setState({show: false, submitClicked: false})
