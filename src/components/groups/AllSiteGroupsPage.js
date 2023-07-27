@@ -11,7 +11,8 @@ import {
     faExternalLinkAlt,
     faFastBackward,
     faFastForward,
-    faList, faRedo,
+    faList,
+    faRedo,
     faSearch,
     faStepBackward,
     faStepForward,
@@ -22,6 +23,7 @@ import {Link} from "react-router-dom";
 import ToastMessage from "../custom/ToastMessage";
 import axios from "axios";
 import {getGroupStatusBtnColor, getGroupStatusMsg} from "../../utils/statusConverter";
+import {BASE_URL} from "../../utils/config";
 
 class AllSiteGroupsPage extends Component {
     constructor(props) {
@@ -40,51 +42,42 @@ class AllSiteGroupsPage extends Component {
         this.findAllSiteGroups(this.state.currentPage);
     }
 
-    findAllSiteGroups(currentPage) {
+    async findAllSiteGroups(currentPage) {
         currentPage -= 1;
-        axios
-            .get(
-                "http://localhost:8080/api/v1/site-groups?pageNumber=" +
-                currentPage +
-                "&pageSize=" +
-                this.state.siteGroupsPerPage +
-                "&sortBy=name&sortDir=" +
-                this.state.sortDir
-            )
-            .then((response) => response.data)
-            .then((data) => {
-                const totalPages = data.totalPages;
-                this.setState({
-                    siteGroups: data.content,
-                    totalPages: totalPages,
-                    totalElements: data.totalElements,
-                    currentPage: data.number + 1,
-                });
-                this.getAllPageNumbers(totalPages);
+        try {
+            const sitesPerPage = this.state.siteGroupsPerPage;
+            const sortDir = this.state.sortDir;
+            const resp = await axios.get(`${BASE_URL}/site-groups?pageNumber=${currentPage}&pageSize=${sitesPerPage}&sortBy=name&sortDir=${sortDir}`);
+            const data = resp.data;
 
-            })
-            .catch((error) => {
-                console.log(error);
+            const totalPages = data.totalPages;
+            this.setState({
+                siteGroups: data.content,
+                totalPages: totalPages,
+                totalElements: data.totalElements,
+                currentPage: data.number + 1,
             });
+            this.getAllPageNumbers(totalPages);
+        } catch (e) {
+            console.log(e);
+        }
     }
 
-    deleteSiteGroup = (siteGroupId) => {
-        this.props.deleteSiteGroup(siteGroupId);
-        setTimeout(() => {
-            if (this.props.siteGroupObject != null) {
-                this.setState({show: true});
-                setTimeout(() => {
-                    this.setState({show: false})
-                }, 2000);
-                if (this.isLastElementOnPage() && this.state.currentPage !== 1) {
-                    this.findAllSiteGroups(this.state.currentPage - 1);
-                } else {
-                    this.findAllSiteGroups(this.state.currentPage);
-                }
+    deleteSiteGroup = async (siteGroupId) => {
+        await this.props.deleteSiteGroup(siteGroupId);
+        if (this.props.siteGroupObject != null) {
+            this.setState({show: true});
+            setTimeout(() => {
+                this.setState({show: false})
+            }, 2000);
+            if (this.isLastElementOnPage() && this.state.currentPage !== 1) {
+                await this.findAllSiteGroups(this.state.currentPage - 1);
             } else {
-                this.setState({show: false});
+                await this.findAllSiteGroups(this.state.currentPage);
             }
-        }, 500);
+        } else {
+            this.setState({show: false});
+        }
     };
 
     isLastElementOnPage() {
@@ -112,7 +105,7 @@ class AllSiteGroupsPage extends Component {
         }
     };
 
-    changePage = (event) => {
+    changePage = async (event) => {
         let targetPage = event.target.value;
         this.setState({
             [event.target.name]: targetPage,
@@ -123,34 +116,34 @@ class AllSiteGroupsPage extends Component {
             if (this.state.search) {
                 this.searchData(targetPage);
             } else {
-                this.findAllSiteGroups(targetPage);
+                await this.findAllSiteGroups(targetPage);
             }
         }
     };
 
-    firstPage = () => {
+    firstPage = async () => {
         let firstPage = 1;
         if (this.state.currentPage > firstPage) {
             if (this.state.search) {
                 this.searchData(firstPage);
             } else {
-                this.findAllSiteGroups(firstPage);
+                await this.findAllSiteGroups(firstPage);
             }
         }
     };
 
-    prevPage = () => {
+    prevPage = async () => {
         let prevPage = 1;
         if (this.state.currentPage > prevPage) {
             if (this.state.search) {
                 this.searchData(this.state.currentPage - prevPage);
             } else {
-                this.findAllSiteGroups(this.state.currentPage - prevPage);
+                await this.findAllSiteGroups(this.state.currentPage - prevPage);
             }
         }
     };
 
-    lastPage = () => {
+    lastPage = async () => {
         let condition = Math.ceil(
             this.state.totalElements / this.state.siteGroupsPerPage
         );
@@ -158,12 +151,12 @@ class AllSiteGroupsPage extends Component {
             if (this.state.search) {
                 this.searchData(condition);
             } else {
-                this.findAllSiteGroups(condition);
+                await this.findAllSiteGroups(condition);
             }
         }
     };
 
-    nextPage = () => {
+    nextPage = async () => {
         if (
             this.state.currentPage <
             Math.ceil(this.state.totalElements / this.state.siteGroupsPerPage)
@@ -171,7 +164,7 @@ class AllSiteGroupsPage extends Component {
             if (this.state.search) {
                 this.searchData(this.state.currentPage + 1);
             } else {
-                this.findAllSiteGroups(this.state.currentPage + 1);
+                await this.findAllSiteGroups(this.state.currentPage + 1);
             }
         }
     };
@@ -182,10 +175,9 @@ class AllSiteGroupsPage extends Component {
         });
     };
 
-    cancelSearch = () => {
+    refreshPage = async () => {
         this.setState({search: ""});
-        console.log("this.state.currentPage", this.state.currentPage)
-        this.findAllSiteGroups(this.state.currentPage);
+        await this.findAllSiteGroups(this.state.currentPage);
     };
 
     searchData = (currentPage) => {
@@ -258,7 +250,7 @@ class AllSiteGroupsPage extends Component {
                                         variant="outline-danger"
                                         className={"m-1"}
                                         type="button"
-                                        onClick={this.cancelSearch}
+                                        onClick={this.refreshPage}
                                     >
                                         <FontAwesomeIcon icon={faTimes}/>
                                     </Button>
@@ -275,12 +267,14 @@ class AllSiteGroupsPage extends Component {
                                 Добавить группу
                             </Link>
                             <Button
-                                style={{float:"right"}}
+                                style={{float: "right"}}
                                 size="sm"
                                 variant="outline-info"
                                 className={"m-1"}
                                 type="button"
-                                onClick={()=>{this.findAllSiteGroups(currentPage)}}
+                                onClick={async () => {
+                                    await this.findAllSiteGroups(currentPage)
+                                }}
                             >
                                 Обновить <FontAwesomeIcon icon={faRedo}/>
                             </Button>

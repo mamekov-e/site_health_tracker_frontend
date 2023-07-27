@@ -23,6 +23,7 @@ import {Link} from "react-router-dom";
 import ToastMessage from "../custom/ToastMessage";
 import axios from "axios";
 import SiteCheckLogsModal from "./SiteCheckLogsModal";
+import {BASE_URL} from "../../utils/config";
 
 class AllSitesPage extends Component {
     constructor(props) {
@@ -42,50 +43,42 @@ class AllSitesPage extends Component {
         this.findAllSites(this.state.currentPage);
     }
 
-    findAllSites(currentPage) {
+    async findAllSites(currentPage) {
         currentPage -= 1;
-        axios
-            .get(
-                "http://localhost:8080/api/v1/sites?pageNumber=" +
-                currentPage +
-                "&pageSize=" +
-                this.state.sitesPerPage +
-                "&sortBy=name&sortDir=" +
-                this.state.sortDir
-            )
-            .then((response) => response.data)
-            .then((data) => {
-                const totalPages = data.totalPages;
-                this.setState({
-                    sites: data.content,
-                    totalPages: totalPages,
-                    totalElements: data.totalElements,
-                    currentPage: data.number + 1,
-                });
-                this.getAllPageNumbers(totalPages);
-            })
-            .catch((error) => {
-                console.log(error);
+        try {
+            const sitesPerPage = this.state.sitesPerPage;
+            const sortDir = this.state.sortDir;
+            const resp = await axios.get(`${BASE_URL}/sites?pageNumber=${currentPage}&pageSize=${sitesPerPage}&sortBy=name&sortDir=${sortDir}`);
+            const data = resp.data;
+
+            const totalPages = data.totalPages;
+            this.setState({
+                sites: data.content,
+                totalPages: totalPages,
+                totalElements: data.totalElements,
+                currentPage: data.number + 1,
             });
+            this.getAllPageNumbers(totalPages);
+        } catch (e) {
+            console.log(e);
+        }
     }
 
-    deleteSite = (siteId) => {
-        this.props.deleteSite(siteId);
-        setTimeout(() => {
-            if (this.props.siteObject != null) {
-                this.setState({show: true});
-                setTimeout(() => {
-                    this.setState({show: false});
-                }, 2000);
-                if (this.isLastElementOnPage() && this.state.currentPage !== 1) {
-                    this.findAllSites(this.state.currentPage - 1);
-                } else {
-                    this.findAllSites(this.state.currentPage);
-                }
-            } else {
+    deleteSite = async (siteId) => {
+        await this.props.deleteSite(siteId);
+        if (this.props.siteObject != null) {
+            this.setState({show: true});
+            setTimeout(() => {
                 this.setState({show: false});
+            }, 2000);
+            if (this.isLastElementOnPage() && this.state.currentPage !== 1) {
+                await this.findAllSites(this.state.currentPage - 1);
+            } else {
+                await this.findAllSites(this.state.currentPage);
             }
-        }, 500);
+        } else {
+            this.setState({show: false});
+        }
     };
 
     isLastElementOnPage() {
@@ -113,7 +106,7 @@ class AllSitesPage extends Component {
         }
     };
 
-    changePage = (event) => {
+    changePage = async (event) => {
         let targetPage = event.target.value;
         this.setState({
             [event.target.name]: targetPage,
@@ -124,34 +117,34 @@ class AllSitesPage extends Component {
             if (this.state.search) {
                 this.searchData(targetPage);
             } else {
-                this.findAllSites(targetPage);
+                await this.findAllSites(targetPage);
             }
         }
     };
 
-    firstPage = () => {
+    firstPage = async () => {
         let firstPage = 1;
         if (this.state.currentPage > firstPage) {
             if (this.state.search) {
                 this.searchData(firstPage);
             } else {
-                this.findAllSites(firstPage);
+                await this.findAllSites(firstPage);
             }
         }
     };
 
-    prevPage = () => {
+    prevPage = async () => {
         let prevPage = 1;
         if (this.state.currentPage > prevPage) {
             if (this.state.search) {
                 this.searchData(this.state.currentPage - prevPage);
             } else {
-                this.findAllSites(this.state.currentPage - prevPage);
+                await this.findAllSites(this.state.currentPage - prevPage);
             }
         }
     };
 
-    lastPage = () => {
+    lastPage = async () => {
         let condition = Math.ceil(
             this.state.totalElements / this.state.sitesPerPage
         );
@@ -159,12 +152,12 @@ class AllSitesPage extends Component {
             if (this.state.search) {
                 this.searchData(condition);
             } else {
-                this.findAllSites(condition);
+                await this.findAllSites(condition);
             }
         }
     };
 
-    nextPage = () => {
+    nextPage = async () => {
         if (
             this.state.currentPage <
             Math.ceil(this.state.totalElements / this.state.sitesPerPage)
@@ -172,7 +165,7 @@ class AllSitesPage extends Component {
             if (this.state.search) {
                 this.searchData(this.state.currentPage + 1);
             } else {
-                this.findAllSites(this.state.currentPage + 1);
+                await this.findAllSites(this.state.currentPage + 1);
             }
         }
     };
@@ -183,45 +176,38 @@ class AllSitesPage extends Component {
         });
     };
 
-    refreshPage = () => {
-        this.setState({search: ""});
-        this.findAllSites(this.state.currentPage);
+    refreshPage = async () => {
+        this.setState({search: "", siteCheckModalShow: false});
+        await this.findAllSites(this.state.currentPage);
     };
 
-    searchData = (currentPage) => {
+    searchData = async (currentPage) => {
         const searchValue = this.state.search.trim();
         if (searchValue) {
             currentPage -= 1;
-            axios.get(
-                "http://localhost:8080/api/v1/sites/search/" +
-                searchValue +
-                "?page=" +
-                currentPage +
-                "&size=" +
-                this.state.sitesPerPage
-            )
-                .then((response) => response.data)
-                .then((data) => {
-                    this.setState({
-                        sites: data.content,
-                        totalPages: data.totalPages,
-                        totalElements: data.totalElements,
-                        currentPage: data.number + 1,
-                    });
-                    this.getAllPageNumbers(data.totalPages)
+            try {
+                const sitesPerPage = this.state.sitesPerPage
+                const resp = await axios.get(`${BASE_URL}/sites/search/${searchValue}?page=${currentPage}&size=${sitesPerPage}`);
+
+                const data = resp.data;
+
+                this.setState({
+                    sites: data.content,
+                    totalPages: data.totalPages,
+                    totalElements: data.totalElements,
+                    currentPage: data.number + 1,
                 });
+                this.getAllPageNumbers(data.totalPages)
+            } catch (e) {
+                console.log(e)
+            }
         } else {
             this.setState({search: ""})
         }
     }
 
-    handleModalClose = () => {
-        this.setState({siteCheckModalShow: false})
-        this.refreshPage()
-    }
-
     render() {
-        const {sites, currentPage, totalPages, search, siteCheckModalShow} = this.state;
+        const {sites, currentPage, totalPages, search, siteCheckModalShow, clickedSite} = this.state;
 
         return (
             <div>
@@ -232,6 +218,11 @@ class AllSitesPage extends Component {
                         type={"danger"}
                     />
                 </div>
+                {siteCheckModalShow && (
+                    <SiteCheckLogsModal handleModalClose={this.refreshPage}
+                                        siteCheckModalShow={siteCheckModalShow}
+                                        site={clickedSite}/>
+                )}
                 <Card className={"border border-dark bg-dark text-white"}>
                     <Card.Header>
                         <div className={"content-header"}>
@@ -285,8 +276,8 @@ class AllSitesPage extends Component {
                                 variant="outline-info"
                                 className={"m-1"}
                                 type="button"
-                                onClick={() => {
-                                    this.findAllSites(currentPage)
+                                onClick={async () => {
+                                    await this.findAllSites(currentPage)
                                 }}
                             >
                                 Обновить <FontAwesomeIcon icon={faRedo}/>
@@ -344,16 +335,11 @@ class AllSitesPage extends Component {
                                                     size="sm"
                                                     variant="outline-warning"
                                                     onClick={() => {
-                                                        this.setState({siteCheckModalShow: true})
+                                                        this.setState({siteCheckModalShow: true, clickedSite: site})
                                                     }}
                                                 >
                                                     <FontAwesomeIcon icon={faExternalLinkAlt}/>
                                                 </Button>
-                                                {siteCheckModalShow && (
-                                                    <SiteCheckLogsModal handleModalClose={this.handleModalClose}
-                                                                        siteCheckModalShow={siteCheckModalShow}
-                                                                        site={site}/>
-                                                )}
                                             </ButtonGroup>
                                         </td>
                                     </tr>

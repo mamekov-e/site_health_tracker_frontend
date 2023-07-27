@@ -9,7 +9,7 @@ import {fetchSite, saveSite, updateSite,} from "../../services/index";
 
 import {Button, Card, Col, Form} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faEdit, faList, faPlusSquare, faSave, faUndo,} from "@fortawesome/free-solid-svg-icons";
+import {faArrowLeft, faSave, faUndo,} from "@fortawesome/free-solid-svg-icons";
 import ToastMessage from "../custom/ToastMessage";
 import {siteFormSchema} from "../../utils/yupSchemas";
 
@@ -44,28 +44,26 @@ class SiteForm extends Component {
         yup.setLocale(ru);
     }
 
-    findSiteById = (siteId) => {
-        this.props.fetchSite(siteId);
-        setTimeout(() => {
-            let site = this.props.siteObject.site;
-            if (site != null) {
-                this.setState({
+    findSiteById = async (siteId) => {
+        await this.props.fetchSite(siteId);
+        let site = this.props.siteObject.site;
+        if (site != null) {
+            this.setState({
+                id: site.id,
+                name: site.name,
+                description: site.description,
+                url: site.url,
+                siteHealthCheckInterval: site.siteHealthCheckInterval
+            });
+            this.formikRef.current.setValues({
                     id: site.id,
                     name: site.name,
                     description: site.description,
                     url: site.url,
-                    siteHealthCheckInterval: site.siteHealthCheckInterval
-                });
-                this.formikRef.current.setValues({
-                        id: site.id,
-                        name: site.name,
-                        description: site.description,
-                        url: site.url,
-                        siteHealthCheckInterval: site.siteHealthCheckInterval + ""
-                    }
-                )
-            }
-        }, 300);
+                    siteHealthCheckInterval: site.siteHealthCheckInterval + ""
+                }
+            )
+        }
     };
 
     resetSite = () => {
@@ -75,60 +73,36 @@ class SiteForm extends Component {
         } : this.initialState);
     };
 
-    submitSite = (values) => {
+    submitSite = async (values) => {
+        const siteId = this.state.id;
         const site = {
+            id: siteId,
             name: values.name,
             description: values.description,
             url: values.url,
             siteHealthCheckInterval: values.siteHealthCheckInterval
         };
 
-        this.props.saveSite(site);
-        setTimeout(() => {
-            const resp = this.props.siteObject;
-            if (resp.site) {
-                this.setState({show: true, method: "post"});
-                setTimeout(() => {
-                    this.setState({show: false})
-                    this.siteList()
-                }, 2000);
-            } else if (resp.error) {
-                this.setState({error: resp.error.data.message})
-                setTimeout(() => {
-                    this.setState({error: null})
-                }, 3000);
-            } else {
-                this.setState({show: false});
-            }
-        }, 500);
-    };
-
-    updateSite = (values) => {
-        const site = {
-            id: this.state.id,
-            name: values.name,
-            description: values.description,
-            url: values.url,
-            siteHealthCheckInterval: values.siteHealthCheckInterval
-        };
-        this.props.updateSite(site);
-        setTimeout(() => {
-            const resp = this.props.siteObject;
-            if (resp.site) {
-                this.setState({show: true, method: "put"});
-                setTimeout(() => {
-                    this.setState({show: false})
-                    this.siteList();
-                }, 2000);
-            } else if (resp.error) {
-                this.setState({error: resp.error.data.message})
-                setTimeout(() => {
-                    this.setState({error: null})
-                }, 3000);
-            } else {
-                this.setState({show: false});
-            }
-        }, 500);
+        if (siteId) {
+            await this.props.updateSite(site);
+        } else {
+            await this.props.saveSite(site);
+        }
+        const resp = this.props.siteObject;
+        if (resp.site) {
+            this.setState({show: true, method: siteId ? "put" : "post"});
+            setTimeout(() => {
+                this.setState({show: false})
+                this.siteList()
+            }, 2000);
+        } else if (resp.error) {
+            this.setState({error: resp.error.data.message})
+            setTimeout(() => {
+                this.setState({error: null})
+            }, 3000);
+        } else {
+            this.setState({show: false});
+        }
     };
 
     siteList = () => {
@@ -154,7 +128,9 @@ class SiteForm extends Component {
                 <Card className={"border border-dark bg-dark text-white"}>
                     <Card.Header>
                         <div className={"content-header"}>
-                            <FontAwesomeIcon icon={this.state.id ? faEdit : faPlusSquare}/>{"  "}
+                            <FontAwesomeIcon icon={faArrowLeft}
+                                             onClick={this.props.history.goBack}
+                                             style={{cursor: "pointer"}}/>
                             {this.state.id ? "Редактировать сайт" : "Добавить новый сайт"}
                         </div>
                         {error && (
@@ -173,7 +149,7 @@ class SiteForm extends Component {
                         innerRef={this.formikRef}
                         validationSchema={siteFormSchema}
                         onReset={this.resetSite}
-                        onSubmit={this.state.id ? this.updateSite : this.submitSite}
+                        onSubmit={this.submitSite}
                     >
                         {({handleSubmit, handleReset, handleChange, values, errors}) => (
                             <Form
@@ -265,14 +241,6 @@ class SiteForm extends Component {
                                     </Button>{" "}
                                     <Button size="sm" variant="info" type="reset">
                                         <FontAwesomeIcon icon={faUndo}/> Сбросить
-                                    </Button>{" "}
-                                    <Button
-                                        size="sm"
-                                        variant="info"
-                                        type="button"
-                                        onClick={() => this.siteList()}
-                                    >
-                                        <FontAwesomeIcon icon={faList}/> Все сайты
                                     </Button>
                                 </Card.Footer>
                             </Form>

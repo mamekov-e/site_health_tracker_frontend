@@ -23,6 +23,7 @@ import axios from "axios";
 import {getGroupStatusBtnColor, getGroupStatusMsg} from "../../utils/statusConverter";
 import SearchAndAddSiteModal from "./SearchAndAddSiteModal";
 import SiteCheckLogsModal from "../sites/SiteCheckLogsModal";
+import {BASE_URL} from "../../utils/config";
 
 class SitesOfGroup extends Component {
     constructor(props) {
@@ -46,7 +47,6 @@ class SitesOfGroup extends Component {
 
     componentDidMount() {
         const siteGroupId = +this.props.match.params.id;
-        console.log(siteGroupId)
         if (siteGroupId) {
             this.setState({siteGroupId: siteGroupId})
             this.findAllGroupSitesById(this.state.currentPage, siteGroupId)
@@ -54,77 +54,64 @@ class SitesOfGroup extends Component {
         }
     }
 
-    findAllGroupSitesById(currentPage, siteGroupId) {
+    async findAllGroupSitesById(currentPage, siteGroupId) {
         currentPage -= 1;
-        axios
-            .get(
-                "http://localhost:8080/api/v1/site-groups/" + siteGroupId +
-                "/sites?pageNumber=" +
-                currentPage +
-                "&pageSize=" +
-                this.state.sitesPerPage +
-                "&sortBy=name&sortDir=" +
-                this.state.sortDir
-            )
-            .then((response) => response.data)
-            .then((data) => {
-                console.log(data)
-                const totalPages = data.totalPages;
-                this.setState({
-                    sites: data.content,
-                    totalPages: totalPages,
-                    totalElements: data.totalElements,
-                    currentPage: data.number + 1,
-                });
-                this.getAllPageNumbers(totalPages);
-            })
-            .catch((error) => {
-                console.log(error);
+        try {
+            const sitesPerPage = this.state.sitesPerPage;
+            const sortDir = this.state.sortDir;
+            const resp = await axios.get(`${BASE_URL}/site-groups/${siteGroupId}/sites?pageNumber=${currentPage}&pageSize=${sitesPerPage}&sortBy=name&sortDir=${sortDir}`);
+            const data = resp.data;
+
+            const totalPages = data.totalPages;
+            this.setState({
+                sites: data.content,
+                totalPages: totalPages,
+                totalElements: data.totalElements,
+                currentPage: data.number + 1,
             });
+            this.getAllPageNumbers(totalPages);
+        } catch (e) {
+            console.log(e);
+        }
     }
 
-    findSiteGroupById = (siteGroupId) => {
-        this.props.fetchSiteGroup(siteGroupId);
-        setTimeout(() => {
-            let siteGroup = this.props.siteGroupObject.siteGroup;
-            console.log("this.props", this.props.siteGroupObject)
-            if (siteGroup != null) {
-                this.setState({
-                    siteGroup: {
-                        name: siteGroup.name,
-                        status: siteGroup.status
-                    }
-                });
-            }
-        }, 300);
+    findSiteGroupById = async (siteGroupId) => {
+        await this.props.fetchSiteGroup(siteGroupId);
+        let siteGroup = this.props.siteGroupObject.siteGroup;
+
+        if (siteGroup != null) {
+            this.setState({
+                siteGroup: {
+                    name: siteGroup.name,
+                    status: siteGroup.status
+                }
+            });
+        }
     };
 
-    deleteSitesOfGroupById = (site) => {
+    deleteSitesOfGroupById = async (site) => {
         let sites = []
         sites.push(site)
         const siteGroupId = this.state.siteGroupId;
-        this.props.deleteSitesOfGroup(siteGroupId, sites);
-        setTimeout(() => {
-            const resp = this.props.siteGroupObject;
-            console.log("resp", resp)
-            if (!resp.error) {
-                this.setState({show: true});
-                setTimeout(() => {
-                    this.setState({show: false});
-                }, 2000);
-                const currentPage = this.state.currentPage;
-                if (this.isLastElementOnPage() && currentPage !== 1) {
-                    this.findAllGroupSitesById(currentPage - 1, siteGroupId);
-                } else {
-                    this.findAllGroupSitesById(currentPage, siteGroupId);
-                }
+        await this.props.deleteSitesOfGroup(siteGroupId, sites);
+        const resp = this.props.siteGroupObject;
+        if (!resp.error) {
+            this.setState({show: true});
+            setTimeout(() => {
+                this.setState({show: false});
+            }, 2000);
+            const currentPage = this.state.currentPage;
+            if (this.isLastElementOnPage() && currentPage !== 1) {
+                await this.findAllGroupSitesById(currentPage - 1, siteGroupId);
             } else {
-                this.setState({error: resp.error.data.message})
-                setTimeout(() => {
-                    this.setState({error: null})
-                }, 3000);
+                await this.findAllGroupSitesById(currentPage, siteGroupId);
             }
-        }, 500);
+        } else {
+            this.setState({error: resp.error.data.message})
+            setTimeout(() => {
+                this.setState({error: null})
+            }, 3000);
+        }
     };
 
     isLastElementOnPage() {
@@ -232,32 +219,31 @@ class SitesOfGroup extends Component {
         this.findAllGroupSitesById(this.state.currentPage, this.state.siteGroupId);
     };
 
-    searchData = (currentPage) => {
+    searchData = async (currentPage) => {
         let currentPageForSearch = !isNaN(currentPage) ? currentPage : this.state.currentPage;
         console.log("currentPage", !isNaN(currentPage))
         console.log("currentPage", currentPage)
         console.log("currentPageForSearch", this.state.currentPage)
         const searchValue = this.state.search.trim();
         if (searchValue) {
-            currentPageForSearch -= 1;
-            axios.get(
-                "http://localhost:8080/api/v1/site-groups/" + this.state.siteGroupId + "/sites/search/" +
-                searchValue +
-                "?page=" +
-                currentPageForSearch +
-                "&size=" +
-                this.state.sitesPerPage
-            )
-                .then((response) => response.data)
-                .then((data) => {
-                    this.setState({
-                        sites: data.content,
-                        totalPages: data.totalPages,
-                        totalElements: data.totalElements,
-                        currentPage: data.number + 1,
-                    });
-                    this.getAllPageNumbers(data.totalPages)
+            try {
+                currentPageForSearch -= 1;
+                const sitesPerPage = this.state.sitesPerPage
+                const siteGroupId = this.state.siteGroupId
+                const resp = await axios.get(`${BASE_URL}/site-groups/${siteGroupId}/sites/search/${searchValue}?page=${currentPageForSearch}&size=${sitesPerPage}`);
+                const data = resp.data;
+
+                this.setState({
+                    sites: data.content,
+                    totalPages: data.totalPages,
+                    totalElements: data.totalElements,
+                    currentPage: data.number + 1,
                 });
+                this.getAllPageNumbers(data.totalPages)
+            } catch (e) {
+                console.log(e)
+            }
+
         } else {
             this.setState({search: ""})
         }
@@ -271,7 +257,7 @@ class SitesOfGroup extends Component {
     render() {
         const {
             sites, siteGroup, currentPage, totalPages, search,
-            addSiteToGroupShow, error, siteCheckModalShow
+            addSiteToGroupShow, error, siteCheckModalShow, clickedSite
         } = this.state;
 
         return (
@@ -287,6 +273,11 @@ class SitesOfGroup extends Component {
                     <SearchAndAddSiteModal handleModalClose={this.handleModalClose}
                                            addSiteToGroupShow={addSiteToGroupShow}
                                            siteGroupId={this.state.siteGroupId}/>
+                )}
+                {siteCheckModalShow && (
+                    <SiteCheckLogsModal handleModalClose={this.refreshData}
+                                        siteCheckModalShow={siteCheckModalShow}
+                                        site={clickedSite}/>
                 )}
                 {error && (
                     <div className={"error-message"}>
@@ -410,16 +401,11 @@ class SitesOfGroup extends Component {
                                                     size="sm"
                                                     variant="outline-warning"
                                                     onClick={() => {
-                                                        this.setState({siteCheckModalShow: true})
+                                                        this.setState({siteCheckModalShow: true, clickedSite: site})
                                                     }}
                                                 >
                                                     <FontAwesomeIcon icon={faExternalLinkAlt}/>
                                                 </Button>
-                                                {siteCheckModalShow && (
-                                                    <SiteCheckLogsModal handleModalClose={this.refreshData}
-                                                                        siteCheckModalShow={siteCheckModalShow}
-                                                                        site={site}/>
-                                                )}
                                             </ButtonGroup>
                                         </td>
                                     </tr>

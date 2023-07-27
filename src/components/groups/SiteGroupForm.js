@@ -9,7 +9,7 @@ import {fetchSiteGroup, saveSiteGroup, updateSiteGroup,} from "../../services/in
 
 import {Button, Card, Col, Form} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faEdit, faList, faPlusSquare, faSave, faUndo,} from "@fortawesome/free-solid-svg-icons";
+import {faArrowLeft, faSave, faUndo,} from "@fortawesome/free-solid-svg-icons";
 import ToastMessage from "../custom/ToastMessage";
 import {siteGroupFormSchema} from "../../utils/yupSchemas";
 
@@ -41,24 +41,22 @@ class SiteGroupForm extends Component {
         yup.setLocale(ru);
     }
 
-    findSiteGroupById = (siteGroupId) => {
-        this.props.fetchSiteGroup(siteGroupId);
-        setTimeout(() => {
-            let siteGroup = this.props.siteGroupObject.siteGroup;
-            if (siteGroup != null) {
-                this.setState({
+    findSiteGroupById = async (siteGroupId) => {
+        await this.props.fetchSiteGroup(siteGroupId);
+        let siteGroup = this.props.siteGroupObject.siteGroup;
+        if (siteGroup != null) {
+            this.setState({
+                id: siteGroup.id,
+                name: siteGroup.name,
+                description: siteGroup.description
+            });
+            this.formikRef.current.setValues({
                     id: siteGroup.id,
                     name: siteGroup.name,
                     description: siteGroup.description
-                });
-                this.formikRef.current.setValues({
-                        id: siteGroup.id,
-                        name: siteGroup.name,
-                        description: siteGroup.description
-                    }
-                )
-            }
-        }, 300);
+                }
+            )
+        }
     };
 
     resetSiteGroup = () => {
@@ -68,56 +66,33 @@ class SiteGroupForm extends Component {
         } : this.initialState);
     };
 
-    submitSiteGroup = (values) => {
+    submitSiteGroup = async (values) => {
+        const siteGroupId = this.state.id;
         const siteGroup = {
+            id: siteGroupId,
             name: values.name,
             description: values.description
         };
-
-        this.props.saveSiteGroup(siteGroup);
-        setTimeout(() => {
-            const resp = this.props.siteGroupObject;
-            if (resp.siteGroup != null) {
-                this.setState({show: true, method: "post"});
-                setTimeout(() => {
-                    this.setState({show: false})
-                    this.siteGroupList();
-                }, 2000);
-            } else if (resp.error) {
-                this.setState({error: resp.error.data.message})
-                setTimeout(() => {
-                    this.setState({error: null})
-                }, 3000);
-            } else {
-                this.setState({show: false});
-            }
-        }, 500);
-    };
-
-    updateSiteGroup = (values) => {
-        const siteGroup = {
-            id: this.state.id,
-            name: values.name,
-            description: values.description
-        };
-        this.props.updateSiteGroup(siteGroup);
-        setTimeout(() => {
-            const resp = this.props.siteGroupObject
-            if (resp.siteGroup != null) {
-                this.setState({show: true, method: "put"});
-                setTimeout(() => {
-                    this.setState({show: false})
-                    this.siteGroupList()
-                }, 2000);
-            } else if (resp.error) {
-                this.setState({error: resp.error.data.message})
-                setTimeout(() => {
-                    this.setState({error: null})
-                }, 3000);
-            } else {
-                this.setState({show: false});
-            }
-        }, 500);
+        if (siteGroupId) {
+            await this.props.updateSiteGroup(siteGroup);
+        } else {
+            await this.props.saveSiteGroup(siteGroup);
+        }
+        const resp = this.props.siteGroupObject;
+        if (resp.siteGroup != null) {
+            this.setState({show: true, method: siteGroupId ? "put" : "post"});
+            setTimeout(() => {
+                this.setState({show: false})
+                this.siteGroupList();
+            }, 2000);
+        } else if (resp.error) {
+            this.setState({error: resp.error.data.message})
+            setTimeout(() => {
+                this.setState({error: null})
+            }, 3000);
+        } else {
+            this.setState({show: false});
+        }
     };
 
     siteGroupList = () => {
@@ -144,7 +119,9 @@ class SiteGroupForm extends Component {
                 <Card className={"border border-dark bg-dark text-white"}>
                     <Card.Header>
                         <div className={"content-header"}>
-                            <FontAwesomeIcon icon={this.state.id ? faEdit : faPlusSquare}/>{" "}
+                            <FontAwesomeIcon icon={faArrowLeft}
+                                             onClick={this.props.history.goBack}
+                                             style={{cursor: "pointer"}}/>
                             {this.state.id ? "Редактировать группу" : "Добавить новую группу"}
                         </div>
                         {error && (
@@ -161,7 +138,7 @@ class SiteGroupForm extends Component {
                         innerRef={this.formikRef}
                         validationSchema={siteGroupFormSchema}
                         onReset={this.resetSiteGroup}
-                        onSubmit={this.state.id ? this.updateSiteGroup : this.submitSiteGroup}
+                        onSubmit={this.submitSiteGroup}
                     >
                         {({handleSubmit, handleReset, handleChange, values, errors}) => (
                             <Form
@@ -217,14 +194,6 @@ class SiteGroupForm extends Component {
                                     </Button>{" "}
                                     <Button size="sm" variant="info" type="reset">
                                         <FontAwesomeIcon icon={faUndo}/> Сбросить
-                                    </Button>{" "}
-                                    <Button
-                                        size="sm"
-                                        variant="info"
-                                        type="button"
-                                        onClick={() => this.siteGroupList()}
-                                    >
-                                        <FontAwesomeIcon icon={faList}/> Все группы
                                     </Button>
                                 </Card.Footer>
                             </Form>
@@ -247,8 +216,6 @@ const mapDispatchToProps = (dispatch) => {
         saveSiteGroup: (siteGroup) => dispatch(saveSiteGroup(siteGroup)),
         fetchSiteGroup: (siteGroupId) => dispatch(fetchSiteGroup(siteGroupId)),
         updateSiteGroup: (siteGroup) => dispatch(updateSiteGroup(siteGroup)),
-        // fetchLanguages: () => dispatch(fetchLanguages()),
-        // fetchGenres: () => dispatch(fetchGenres()),
     };
 };
 

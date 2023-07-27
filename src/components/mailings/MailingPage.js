@@ -13,6 +13,7 @@ import ToastMessage from "../custom/ToastMessage";
 import botQr from "../../assets/images/telegram-bot-qr.png"
 import {registerEmail, unregisterEmail} from "../../services";
 import {emailSchema} from "../../utils/yupSchemas";
+import {TELEGRAM_BOT_URL} from "../../utils/config";
 
 
 class SiteForm extends Component {
@@ -27,7 +28,7 @@ class SiteForm extends Component {
     }
 
     openTelegramBot = () => {
-        window.open("https://t.me/site_health_tracker_bot", '_blank', 'noopener,noreferrer');
+        window.open(TELEGRAM_BOT_URL, '_blank', 'noopener,noreferrer');
     };
 
     formikRef = React.createRef();

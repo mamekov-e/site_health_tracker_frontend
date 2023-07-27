@@ -8,6 +8,7 @@ import {getTodayDate, parseDatesInArray} from "../../utils/dateUtil";
 import {convertStatusesToBinaryArr} from "../../utils/statusConverter";
 import axios from "axios";
 import ToastMessage from "../custom/ToastMessage";
+import {BASE_URL} from "../../utils/config";
 
 
 ChartJS.register(
@@ -55,9 +56,7 @@ const SiteCheckLogsModal = ({handleModalClose, siteCheckModalShow, site}) => {
 
     const findAllSiteCheckLogsByDate = async (date) => {
         try {
-            const response = await axios.get(
-                `http://localhost:8080/api/v1/site-check-logs/${site.id}?date=${date}`
-            );
+            const response = await axios.get(`${BASE_URL}/site-check-logs/${site.id}?date=${date}`);
             const data = response.data;
 
             if (!data.length) {
@@ -104,7 +103,7 @@ const SiteCheckLogsModal = ({handleModalClose, siteCheckModalShow, site}) => {
                 },
                 title: {
                     display: true,
-                    text: "Периодичность проверки",
+                    text: `Периодичность проверки ${site.siteHealthCheckInterval} секунд`,
                     font: {
                         size: 16
                     }

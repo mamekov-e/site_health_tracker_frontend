@@ -15,6 +15,7 @@ import {addSitesToGroup} from "../../services";
 import {connect} from "react-redux";
 import axios from "axios";
 import ToastMessage from "../custom/ToastMessage";
+import {BASE_URL} from "../../utils/config";
 
 class SearchAndAddSiteModal extends Component {
     constructor(props) {
@@ -31,27 +32,48 @@ class SearchAndAddSiteModal extends Component {
         };
     }
 
-    addSitesToGroup = (site) => {
+    componentDidMount() {
+        this.findAllSites(this.state.currentPage);
+    }
+
+    async findAllSites(currentPage) {
+        currentPage -= 1;
+        try {
+            const sitesPerPage = this.state.sitesPerPage;
+            const sortDir = this.state.sortDir;
+            const resp = await axios.get(`${BASE_URL}/sites?pageNumber=${currentPage}&pageSize=${sitesPerPage}&sortBy=name&sortDir=${sortDir}`);
+            const data = resp.data;
+
+            const totalPages = data.totalPages;
+            this.setState({
+                sites: data.content,
+                totalPages: totalPages,
+                totalElements: data.totalElements,
+                currentPage: data.number + 1,
+            });
+            this.getAllPageNumbers(totalPages);
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    addSitesToGroup = async (site) => {
         let sites = []
         sites.push(site)
-        console.log("Adding to group: ", sites)
 
-        this.props.addSitesToGroup(this.state.siteGroupId, sites);
-        setTimeout(() => {
-            const resp = this.props.siteGroupObject;
-            console.log(this.props)
-            if (!resp.error) {
-                this.setState({show: true});
-                setTimeout(() => {
-                    this.setState({show: false, search: "", sites: []})
-                }, 2000);
-            } else {
-                this.setState({error: resp.error.data.message, show: true})
-                setTimeout(() => {
-                    this.setState({show: false})
-                }, 3000);
-            }
-        }, 500);
+        await this.props.addSitesToGroup(this.state.siteGroupId, sites);
+        const resp = this.props.siteGroupObject;
+        if (!resp.error) {
+            this.setState({show: true});
+            setTimeout(() => {
+                this.setState({show: false})
+            }, 2000);
+        } else {
+            this.setState({error: resp.error.data.message, show: true})
+            setTimeout(() => {
+                this.setState({show: false})
+            }, 3000);
+        }
     };
 
     getAllPageNumbers(totalPages) {
@@ -69,7 +91,7 @@ class SearchAndAddSiteModal extends Component {
         }
     };
 
-    changePage = (event) => {
+    changePage = async (event) => {
         let targetPage = event.target.value;
         this.setState({
             [event.target.name]: targetPage,
@@ -79,46 +101,56 @@ class SearchAndAddSiteModal extends Component {
         if (targetPage > 0 && targetPage <= totalPages) {
             if (this.state.search) {
                 this.searchData(targetPage);
+            } else {
+                await this.findAllSites(targetPage);
             }
         }
     };
 
-    firstPage = () => {
+    firstPage = async () => {
         let firstPage = 1;
         if (this.state.currentPage > firstPage) {
             if (this.state.search) {
                 this.searchData(firstPage);
+            } else {
+                await this.findAllSites(firstPage);
             }
         }
     };
 
-    prevPage = () => {
+    prevPage = async () => {
         let prevPage = 1;
         if (this.state.currentPage > prevPage) {
             if (this.state.search) {
                 this.searchData(this.state.currentPage - prevPage);
+            } else {
+                await this.findAllSites(this.state.currentPage - prevPage);
             }
         }
     };
 
-    lastPage = () => {
+    lastPage = async () => {
         let condition = Math.ceil(
             this.state.totalElements / this.state.sitesPerPage
         );
         if (this.state.currentPage < condition) {
             if (this.state.search) {
                 this.searchData(condition);
+            } else {
+                await this.findAllSites(condition);
             }
         }
     };
 
-    nextPage = () => {
+    nextPage = async () => {
         if (
             this.state.currentPage <
             Math.ceil(this.state.totalElements / this.state.sitesPerPage)
         ) {
             if (this.state.search) {
                 this.searchData(this.state.currentPage + 1);
+            } else {
+                await this.findAllSites(this.state.currentPage + 1);
             }
         }
     };
@@ -129,32 +161,30 @@ class SearchAndAddSiteModal extends Component {
         });
     };
 
-    cancelSearch = () => {
+    refreshSearch = () => {
         this.setState({search: "", sites: []});
     };
 
-    searchData = (currentPage) => {
+    searchData = async (currentPage) => {
         const searchValue = this.state.search.trim();
         if (searchValue) {
             currentPage -= 1;
-            axios.get(
-                "http://localhost:8080/api/v1/sites/search/" +
-                searchValue +
-                "?page=" +
-                currentPage +
-                "&size=" +
-                this.state.sitesPerPage
-            )
-                .then((response) => response.data)
-                .then((data) => {
-                    this.setState({
-                        sites: data.content,
-                        totalPages: data.totalPages,
-                        totalElements: data.totalElements,
-                        currentPage: data.number + 1,
-                    });
-                    this.getAllPageNumbers(data.totalPages)
+            try {
+                const sitesPerPage = this.state.sitesPerPage
+                const resp = await axios.get(`${BASE_URL}/sites/search/${searchValue}?page=${currentPage}&size=${sitesPerPage}`);
+
+                const data = resp.data;
+
+                this.setState({
+                    sites: data.content,
+                    totalPages: data.totalPages,
+                    totalElements: data.totalElements,
+                    currentPage: data.number + 1,
                 });
+                this.getAllPageNumbers(data.totalPages)
+            } catch (e) {
+                // console.log(e)
+            }
         } else {
             this.setState({search: ""})
         }
@@ -176,7 +206,11 @@ class SearchAndAddSiteModal extends Component {
                        dialogClassName={"my-modal"}
                        onHide={this.props.handleModalClose}>
                     <Modal.Header className={"modal-content"}>
-                        <Modal.Title className={"text-light"}>Поиск сайтов для добавления</Modal.Title>
+                        <div style={{width: "100%", display: "flex", justifyContent: "flex-end"}}>
+                            <Modal.Title className={"text-light"} style={{width: "60%"}}>Поиск сайтов для добавления</Modal.Title>
+                            <Button variant={"secondary"} style={{float: "right"}}
+                                    onClick={this.props.handleModalClose}>Закрыть</Button>
+                        </div>
                         <div style={{display: "flex", justifyContent: "center", width: "100%"}}>
                             <InputGroup size="lg" style={{width: "70%"}}>
                                 <FormControl
@@ -193,7 +227,9 @@ class SearchAndAddSiteModal extends Component {
                                         variant="outline-info"
                                         className={"m-1"}
                                         type="button"
-                                        onClick={this.searchData}
+                                        onClick={async () => {
+                                            await this.searchData()
+                                        }}
                                     >
                                         <FontAwesomeIcon icon={faSearch}/>
                                     </Button>
@@ -202,7 +238,7 @@ class SearchAndAddSiteModal extends Component {
                                         variant="outline-danger"
                                         className={"m-1"}
                                         type="button"
-                                        onClick={this.cancelSearch}
+                                        onClick={this.refreshSearch}
                                     >
                                         <FontAwesomeIcon icon={faTimes}/>
                                     </Button>
@@ -249,18 +285,13 @@ class SearchAndAddSiteModal extends Component {
                                                 <Button
                                                     size="sm"
                                                     variant="primary"
-                                                    onClick={() => this.addSitesToGroup(site)}
+                                                    disabled={show}
+                                                    onClick={async () => {
+                                                        await this.addSitesToGroup(site)
+                                                    }}
                                                 >
                                                     Добавить в группу
                                                 </Button>
-                                                {/*<Button*/}
-                                                {/*    size="sm"*/}
-                                                {/*    variant="outline-warning"*/}
-                                                {/*    onClick={() => {*/}
-                                                {/*    }}*/}
-                                                {/*>*/}
-                                                {/*    <FontAwesomeIcon icon={faExternalLinkAlt}/>*/}
-                                                {/*</Button>*/}
                                             </ButtonGroup>
                                         </td>
                                     </tr>
@@ -327,8 +358,6 @@ class SearchAndAddSiteModal extends Component {
                                 </InputGroup>
                             </div>
                         ) : null}
-                        <Button variant={"secondary"} style={{float: "right"}}
-                                onClick={this.props.handleModalClose}>Закрыть</Button>
                     </Modal.Footer>
                 </Modal>
             </>

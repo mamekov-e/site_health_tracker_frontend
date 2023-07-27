@@ -1,67 +1,60 @@
 import * as ST from "./siteTypes";
 import axios from "axios";
+import {BASE_URL} from "../../utils/config";
 
 export const saveSite = (site) => {
-    return (dispatch) => {
+    return async (dispatch) => {
         dispatch({
             type: ST.SAVE_SITE_REQUEST,
         });
-        axios
-            .post("http://localhost:8080/api/v1/sites", site)
-            .then((response) => {
-                dispatch(siteSuccess(response.data));
-            })
-            .catch((error) => {
-                dispatch(siteFailure(error));
-            });
+        try {
+            const response = await axios.post(`${BASE_URL}/sites`, site)
+            dispatch(siteSuccess(response.data));
+        } catch (error) {
+            dispatch(siteFailure(error));
+        }
     };
 };
 
 export const fetchSite = (siteId) => {
-    return (dispatch) => {
+    return async (dispatch) => {
         dispatch({
             type: ST.FETCH_SITE_REQUEST,
         });
-        axios
-            .get("http://localhost:8080/api/v1/sites/" + siteId)
-            .then((response) => {
-                dispatch(siteSuccess(response.data));
-            })
-            .catch((error) => {
-                dispatch(siteFailure(error));
-            });
+        try {
+            const response = await axios.get(`${BASE_URL}/sites/${siteId}`)
+            dispatch(siteSuccess(response.data));
+        } catch (error) {
+            dispatch(siteFailure(error));
+        }
     };
 };
 
 export const updateSite = (site) => {
-    return (dispatch) => {
+    return async (dispatch) => {
         dispatch({
             type: ST.UPDATE_SITE_REQUEST,
         });
-        axios
-            .put("http://localhost:8080/api/v1/sites", site)
-            .then((response) => {
-                dispatch(siteSuccess(response.data));
-            })
-            .catch((error) => {
-                dispatch(siteFailure(error));
-            });
+        try {
+            const response = await axios.put(`${BASE_URL}/sites`, site)
+            dispatch(siteSuccess(response.data));
+        } catch (error) {
+            dispatch(siteFailure(error));
+        }
     };
 };
 
 export const deleteSite = (siteId) => {
-    return (dispatch) => {
+    return async (dispatch) => {
         dispatch({
             type: ST.DELETE_SITE_REQUEST,
         });
-        axios
-            .delete("http://localhost:8080/api/v1/sites/" + siteId)
-            .then((response) => {
-                dispatch(siteSuccess(response.data));
-            })
-            .catch((error) => {
-                dispatch(siteFailure(error));
-            });
+        try {
+            const response = await axios.delete(`${BASE_URL}/sites/${siteId}`)
+            dispatch(siteSuccess(response.data));
+        } catch (error) {
+            dispatch(siteFailure(error));
+        }
     };
 };
 
