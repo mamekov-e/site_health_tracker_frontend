@@ -213,7 +213,7 @@ class AllSitesPage extends Component {
             currentPage,
             totalPages,
             show,
-            earch,
+            search,
             siteCheckModalShow,
             clickedSite,
             deleteClicked

@@ -3,9 +3,16 @@
   <component name="ChangeListManager">
     <list default="true" id="bb72b985-888c-4c91-b6fa-8ad20ebd803e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/custom/Footer.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/custom/Footer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/groups/AllSiteGroupsPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/groups/AllSiteGroupsPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/groups/SearchAndAddSiteModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/groups/SearchAndAddSiteModal.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/groups/SiteGroupForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/groups/SiteGroupForm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/groups/SitesOfGroupPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/groups/SitesOfGroupPage.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/mailings/MailingPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/mailings/MailingPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sites/AllSitesPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sites/AllSitesPage.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/sites/SiteForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sites/SiteForm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/site/siteTypes.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/site/siteTypes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/site_group/siteGroupTypes.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/site_group/siteGroupTypes.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,6 +33,9 @@
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectId" id="2SsWPfd4UhAKad87UKNkASUEDbs" />
   <component name="ProjectLevelVcsManager">
@@ -68,6 +78,15 @@
       <recent name="C:\Users\USER\WebstormProjects\site_health_tracker_frontend\src\components\sites" />
     </key>
   </component>
+  <component name="RunManager">
+    <configuration name="start" type="js.build_tools.npm" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="start" />
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -81,7 +100,7 @@
       <workItem from="1689936811352" duration="152000" />
       <workItem from="1689937028759" duration="32132000" />
       <workItem from="1690026411587" duration="52063000" />
-      <workItem from="1690169447651" duration="116554000" />
+      <workItem from="1690169447651" duration="117562000" />
     </task>
     <servers />
   </component>
