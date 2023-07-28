@@ -102,7 +102,7 @@ class SearchAndAddSiteModal extends Component {
         targetPage = parseInt(targetPage);
         if (targetPage > 0 && targetPage <= totalPages) {
             if (this.state.search) {
-                this.searchData(targetPage);
+                await this.searchData(targetPage);
             } else {
                 await this.findAllSites(targetPage);
             }
@@ -113,7 +113,7 @@ class SearchAndAddSiteModal extends Component {
         let firstPage = 1;
         if (this.state.currentPage > firstPage) {
             if (this.state.search) {
-                this.searchData(firstPage);
+                await this.searchData(firstPage);
             } else {
                 await this.findAllSites(firstPage);
             }
@@ -124,7 +124,7 @@ class SearchAndAddSiteModal extends Component {
         let prevPage = 1;
         if (this.state.currentPage > prevPage) {
             if (this.state.search) {
-                this.searchData(this.state.currentPage - prevPage);
+                await this.searchData(this.state.currentPage - prevPage);
             } else {
                 await this.findAllSites(this.state.currentPage - prevPage);
             }
@@ -137,7 +137,7 @@ class SearchAndAddSiteModal extends Component {
         );
         if (this.state.currentPage < condition) {
             if (this.state.search) {
-                this.searchData(condition);
+                await this.searchData(condition);
             } else {
                 await this.findAllSites(condition);
             }
@@ -150,7 +150,7 @@ class SearchAndAddSiteModal extends Component {
             Math.ceil(this.state.totalElements / this.state.sitesPerPage)
         ) {
             if (this.state.search) {
-                this.searchData(this.state.currentPage + 1);
+                await this.searchData(this.state.currentPage + 1);
             } else {
                 await this.findAllSites(this.state.currentPage + 1);
             }
@@ -209,7 +209,8 @@ class SearchAndAddSiteModal extends Component {
                        onHide={this.props.handleModalClose}>
                     <Modal.Header className={"modal-content"}>
                         <div style={{width: "100%", display: "flex", justifyContent: "flex-end"}}>
-                            <Modal.Title className={"text-light"} style={{width: "60%"}}>Поиск сайтов для добавления</Modal.Title>
+                            <Modal.Title className={"text-light"} style={{width: "60%"}}>Поиск сайтов для
+                                добавления</Modal.Title>
                             <Button variant={"secondary"}
                                     style={{float: "right"}}
                                     disabled={submitClicked}

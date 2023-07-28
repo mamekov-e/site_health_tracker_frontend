@@ -140,7 +140,7 @@ class SitesOfGroup extends Component {
         }
     };
 
-    changePage = (event) => {
+    changePage = async (event) => {
         let targetPage = event.target.value;
         this.setState({
             [event.target.name]: targetPage,
@@ -149,57 +149,57 @@ class SitesOfGroup extends Component {
         targetPage = parseInt(targetPage);
         if (targetPage > 0 && targetPage <= totalPages) {
             if (this.state.search) {
-                this.searchData(targetPage);
+                await this.searchData(targetPage);
             } else {
-                this.findAllGroupSitesById(targetPage, this.state.siteGroupId);
+                await this.findAllGroupSitesById(targetPage, this.state.siteGroupId);
             }
         }
     };
 
-    firstPage = () => {
+    firstPage = async () => {
         let firstPage = 1;
         if (this.state.currentPage > firstPage) {
             if (this.state.search) {
-                this.searchData(firstPage);
+                await this.searchData(firstPage);
             } else {
-                this.findAllGroupSitesById(firstPage, this.state.siteGroupId);
+                await this.findAllGroupSitesById(firstPage, this.state.siteGroupId);
             }
         }
     };
 
-    prevPage = () => {
+    prevPage = async () => {
         let prevPage = 1;
         if (this.state.currentPage > prevPage) {
             if (this.state.search) {
-                this.searchData(this.state.currentPage - prevPage);
+                await this.searchData(this.state.currentPage - prevPage);
             } else {
-                this.findAllGroupSitesById(this.state.currentPage - prevPage, this.state.siteGroupId);
+                await this.findAllGroupSitesById(this.state.currentPage - prevPage, this.state.siteGroupId);
             }
         }
     };
 
-    lastPage = () => {
+    lastPage = async () => {
         let condition = Math.ceil(
             this.state.totalElements / this.state.sitesPerPage
         );
         if (this.state.currentPage < condition) {
             if (this.state.search) {
-                this.searchData(condition);
+                await this.searchData(condition);
             } else {
-                this.findAllGroupSitesById(condition, this.state.siteGroupId);
+                await this.findAllGroupSitesById(condition, this.state.siteGroupId);
             }
         }
     };
 
-    nextPage = () => {
+    nextPage = async () => {
         if (
             this.state.currentPage <
             Math.ceil(this.state.totalElements / this.state.sitesPerPage)
         ) {
             if (this.state.search) {
-                this.searchData(this.state.currentPage + 1);
+                await this.searchData(this.state.currentPage + 1);
             } else {
-                this.findAllGroupSitesById(this.state.currentPage + 1, this.state.siteGroupId);
+                await this.findAllGroupSitesById(this.state.currentPage + 1, this.state.siteGroupId);
             }
         }
     };
@@ -210,14 +210,14 @@ class SitesOfGroup extends Component {
         });
     };
 
-    refreshData = () => {
+    refreshData = async () => {
         this.setState({
             search: "",
             siteGroupStatus: getGroupStatusMsg(this.props.siteGroupObject.siteGroup),
             siteGroupStatusBtnColor: getGroupStatusBtnColor(this.props.siteGroupObject.siteGroup),
             siteCheckModalShow: false
         });
-        this.findAllGroupSitesById(this.state.currentPage, this.state.siteGroupId);
+        await this.findAllGroupSitesById(this.state.currentPage, this.state.siteGroupId);
     };
 
     searchData = async (currentPage) => {
@@ -250,22 +250,22 @@ class SitesOfGroup extends Component {
         }
     }
 
-    handleModalClose = () => {
+    handleModalClose = async () => {
         this.setState({addSiteToGroupShow: false})
-        this.refreshData()
+        await this.refreshData()
     }
 
     render() {
         const {
-            sites, siteGroup, currentPage, totalPages, search,
-            addSiteToGroupShow, error, siteCheckModalShow, clickedSite,deleteClicked
+            sites, siteGroup, currentPage, totalPages, search, show,
+            addSiteToGroupShow, error, siteCheckModalShow, clickedSite, deleteClicked
         } = this.state;
 
         return (
             <div>
-                <div style={{display: this.state.show ? "block" : "none"}}>
+                <div style={{display: show ? "block" : "none"}}>
                     <ToastMessage
-                        show={this.state.show}
+                        show={show}
                         message={"Сайт успешно удален из группы."}
                         type={"danger"}
                     />

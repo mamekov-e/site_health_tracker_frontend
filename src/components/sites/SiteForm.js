@@ -78,10 +78,10 @@ class SiteForm extends Component {
         const siteId = this.state.id;
         const site = {
             id: siteId,
-            name: values.name,
-            description: values.description,
-            url: values.url,
-            siteHealthCheckInterval: values.siteHealthCheckInterval
+            name: values.name.trim(),
+            description: values.description.trim(),
+            url: values.url.trim(),
+            siteHealthCheckInterval: values.siteHealthCheckInterval.trim()
         };
 
         if (siteId) {
@@ -111,13 +111,13 @@ class SiteForm extends Component {
     };
 
     render() {
-        const {error,submitClicked} = this.state;
+        const {error,submitClicked, show} = this.state;
         const {Formik} = formik;
         return (
             <div>
-                <div style={{display: this.state.show ? "block" : "none"}}>
+                <div style={{display: show ? "block" : "none"}}>
                     <ToastMessage
-                        show={this.state.show}
+                        show={show}
                         message={
                             this.state.method === "put"
                                 ? "Сайт успешно изменен."
@@ -165,7 +165,7 @@ class SiteForm extends Component {
                                             <Form.Label>Название</Form.Label>
                                             <Form.Control
                                                 autoComplete="off"
-                                                readOnly={this.state.show}
+                                                readOnly={show}
                                                 type="text"
                                                 name="name"
                                                 value={values.name.trimStart()}
@@ -183,7 +183,7 @@ class SiteForm extends Component {
                                             <Form.Label>URL</Form.Label>
                                             <Form.Control
                                                 autoComplete="off"
-                                                readOnly={this.state.show}
+                                                readOnly={show}
                                                 type="text"
                                                 name="url"
                                                 value={values.url.trimStart()}
@@ -201,7 +201,7 @@ class SiteForm extends Component {
                                             <Form.Label>Периодичность проверки сайта (в секундах)</Form.Label>
                                             <Form.Control
                                                 autoComplete="off"
-                                                readOnly={this.state.show}
+                                                readOnly={show}
                                                 type="text"
                                                 name="siteHealthCheckInterval"
                                                 value={values.siteHealthCheckInterval.trimStart()}
@@ -222,7 +222,7 @@ class SiteForm extends Component {
                                             <Form.Control
                                                 as={"textarea"}
                                                 autoComplete="off"
-                                                readOnly={this.state.show}
+                                                readOnly={show}
                                                 type="text"
                                                 name="description"
                                                 value={values.description.trimStart()}

@@ -116,7 +116,7 @@ class AllSitesPage extends Component {
         targetPage = parseInt(targetPage);
         if (targetPage > 0 && targetPage <= totalPages) {
             if (this.state.search) {
-                this.searchData(targetPage);
+                await this.searchData(targetPage);
             } else {
                 await this.findAllSites(targetPage);
             }
@@ -127,7 +127,7 @@ class AllSitesPage extends Component {
         let firstPage = 1;
         if (this.state.currentPage > firstPage) {
             if (this.state.search) {
-                this.searchData(firstPage);
+                await this.searchData(firstPage);
             } else {
                 await this.findAllSites(firstPage);
             }
@@ -138,7 +138,7 @@ class AllSitesPage extends Component {
         let prevPage = 1;
         if (this.state.currentPage > prevPage) {
             if (this.state.search) {
-                this.searchData(this.state.currentPage - prevPage);
+                await this.searchData(this.state.currentPage - prevPage);
             } else {
                 await this.findAllSites(this.state.currentPage - prevPage);
             }
@@ -151,7 +151,7 @@ class AllSitesPage extends Component {
         );
         if (this.state.currentPage < condition) {
             if (this.state.search) {
-                this.searchData(condition);
+                await this.searchData(condition);
             } else {
                 await this.findAllSites(condition);
             }
@@ -164,7 +164,7 @@ class AllSitesPage extends Component {
             Math.ceil(this.state.totalElements / this.state.sitesPerPage)
         ) {
             if (this.state.search) {
-                this.searchData(this.state.currentPage + 1);
+                await this.searchData(this.state.currentPage + 1);
             } else {
                 await this.findAllSites(this.state.currentPage + 1);
             }
@@ -208,13 +208,22 @@ class AllSitesPage extends Component {
     }
 
     render() {
-        const {sites, currentPage, totalPages, search, siteCheckModalShow, clickedSite, deleteClicked} = this.state;
+        const {
+            sites,
+            currentPage,
+            totalPages,
+            show,
+            earch,
+            siteCheckModalShow,
+            clickedSite,
+            deleteClicked
+        } = this.state;
 
         return (
             <div>
-                <div style={{display: this.state.show ? "block" : "none"}}>
+                <div style={{display: show ? "block" : "none"}}>
                     <ToastMessage
-                        show={this.state.show}
+                        show={show}
                         message={"Сайт успешно удален."}
                         type={"danger"}
                     />
@@ -366,7 +375,7 @@ class AllSitesPage extends Component {
                                         <Button
                                             type="button"
                                             variant="outline-info"
-                                            disabled={currentPage === 1  || deleteClicked}
+                                            disabled={currentPage === 1 || deleteClicked}
                                             onClick={this.firstPage}
                                         >
                                             <FontAwesomeIcon icon={faFastBackward}/> Первая
@@ -374,7 +383,7 @@ class AllSitesPage extends Component {
                                         <Button
                                             type="button"
                                             variant="outline-info"
-                                            disabled={currentPage === 1  || deleteClicked}
+                                            disabled={currentPage === 1 || deleteClicked}
                                             onClick={this.prevPage}
                                         >
                                             <FontAwesomeIcon icon={faStepBackward}/> Предыдущая

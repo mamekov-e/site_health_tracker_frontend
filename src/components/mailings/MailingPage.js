@@ -44,7 +44,7 @@ class SiteForm extends Component {
     submitEmail = async (values) => {
         this.setState({submitClicked: true})
         const email = {
-            "email-address": values.email
+            "email-address": values.email.trim()
         };
         if (this.state.subscribe) {
             await this.props.registerEmail(email);
@@ -77,9 +77,9 @@ class SiteForm extends Component {
         const {Formik} = formik;
         return (
             <div>
-                <div style={{display: this.state.show ? "block" : "none"}}>
+                <div style={{display: show ? "block" : "none"}}>
                     <ToastMessage
-                        show={this.state.show}
+                        show={show}
                         message={subscribe ? "Письмо подтверждения успешно отправлено" : "Вы успешно отписались от рассылки"}
                         type={subscribe ? "success" : "danger"}
                     />
@@ -120,7 +120,7 @@ class SiteForm extends Component {
                                                 <Form.Label>Почта</Form.Label>
                                                 <Form.Control
                                                     autoComplete="off"
-                                                    readOnly={this.state.show}
+                                                    readOnly={show}
                                                     type="text"
                                                     name="email"
                                                     value={values.email.trimStart()}

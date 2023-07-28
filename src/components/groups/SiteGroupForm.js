@@ -71,8 +71,8 @@ class SiteGroupForm extends Component {
         const siteGroupId = this.state.id;
         const siteGroup = {
             id: siteGroupId,
-            name: values.name,
-            description: values.description
+            name: values.name.trim(),
+            description: values.description.trim()
         };
         if (siteGroupId) {
             await this.props.updateSiteGroup(siteGroup);
@@ -101,14 +101,14 @@ class SiteGroupForm extends Component {
     };
 
     render() {
-        const {error, submitClicked} = this.state;
+        const {error, submitClicked, show} = this.state;
         const {Formik} = formik;
 
         return (
             <div>
-                <div style={{display: this.state.show ? "block" : "none"}}>
+                <div style={{display: show ? "block" : "none"}}>
                     <ToastMessage
-                        show={this.state.show}
+                        show={show}
                         message={
                             this.state.method === "put"
                                 ? "Группа успешно изменена."
@@ -154,7 +154,7 @@ class SiteGroupForm extends Component {
                                             <Form.Label>Название</Form.Label>
                                             <Form.Control
                                                 autoComplete="off"
-                                                readOnly={this.state.show}
+                                                readOnly={show}
                                                 type="text"
                                                 name="name"
                                                 value={values.name.trimStart()}
@@ -173,7 +173,7 @@ class SiteGroupForm extends Component {
                                             <Form.Control
                                                 as={"textarea"}
                                                 autoComplete="off"
-                                                readOnly={this.state.show}
+                                                readOnly={show}
                                                 type="text"
                                                 name="description"
                                                 value={values.description.trimStart()}

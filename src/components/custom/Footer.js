@@ -3,7 +3,7 @@ import React, {useEffect, useState} from "react";
 import {Col, Container, Navbar} from "react-bootstrap";
 
 const Footer = () => {
-    const [fullYear, setFullYear] = useState();
+    const [fullYear, setFullYear] = useState(null);
 
     useEffect(() => {
         setFullYear(new Date().getFullYear());

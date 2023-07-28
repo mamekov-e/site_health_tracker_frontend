@@ -115,7 +115,7 @@ class AllSiteGroupsPage extends Component {
         targetPage = parseInt(targetPage);
         if (targetPage > 0 && targetPage <= totalPages) {
             if (this.state.search) {
-                this.searchData(targetPage);
+                await this.searchData(targetPage);
             } else {
                 await this.findAllSiteGroups(targetPage);
             }
@@ -126,7 +126,7 @@ class AllSiteGroupsPage extends Component {
         let firstPage = 1;
         if (this.state.currentPage > firstPage) {
             if (this.state.search) {
-                this.searchData(firstPage);
+                await this.searchData(firstPage);
             } else {
                 await this.findAllSiteGroups(firstPage);
             }
@@ -137,7 +137,7 @@ class AllSiteGroupsPage extends Component {
         let prevPage = 1;
         if (this.state.currentPage > prevPage) {
             if (this.state.search) {
-                this.searchData(this.state.currentPage - prevPage);
+                await this.searchData(this.state.currentPage - prevPage);
             } else {
                 await this.findAllSiteGroups(this.state.currentPage - prevPage);
             }
@@ -150,7 +150,7 @@ class AllSiteGroupsPage extends Component {
         );
         if (this.state.currentPage < condition) {
             if (this.state.search) {
-                this.searchData(condition);
+                await this.searchData(condition);
             } else {
                 await this.findAllSiteGroups(condition);
             }
@@ -163,7 +163,7 @@ class AllSiteGroupsPage extends Component {
             Math.ceil(this.state.totalElements / this.state.siteGroupsPerPage)
         ) {
             if (this.state.search) {
-                this.searchData(this.state.currentPage + 1);
+                await this.searchData(this.state.currentPage + 1);
             } else {
                 await this.findAllSiteGroups(this.state.currentPage + 1);
             }
@@ -181,41 +181,39 @@ class AllSiteGroupsPage extends Component {
         await this.findAllSiteGroups(this.state.currentPage);
     };
 
-    searchData = (currentPage) => {
+    searchData = async (currentPage) => {
         const searchValue = this.state.search.trim();
         if (searchValue !== "") {
             currentPage -= 1;
-            axios.get(
-                "http://localhost:8080/api/v1/site-groups/search/" +
-                searchValue +
-                "?page=" +
-                currentPage +
-                "&size=" +
-                this.state.siteGroupsPerPage
-            )
-                .then((response) => response.data)
-                .then((data) => {
-                    this.setState({
-                        siteGroups: data.content,
-                        totalPages: data.totalPages,
-                        totalElements: data.totalElements,
-                        currentPage: data.number + 1,
-                    });
-                    this.getAllPageNumbers(data.totalPages)
+            try {
+                const sitesPerPage = this.state.sitesPerPage
+                const resp = await axios.get(`${BASE_URL}/site-groups/search/${searchValue}?page=${currentPage}&size=${sitesPerPage}`);
+
+                const data = resp.data;
+
+                this.setState({
+                    sites: data.content,
+                    totalPages: data.totalPages,
+                    totalElements: data.totalElements,
+                    currentPage: data.number + 1,
                 });
+                this.getAllPageNumbers(data.totalPages)
+            } catch (e) {
+                console.log(e)
+            }
         } else {
             this.setState({search: ""})
         }
     };
 
     render() {
-        const {siteGroups, currentPage, totalPages, search, deleteClicked} = this.state;
+        const {siteGroups, currentPage, totalPages, search, show, deleteClicked} = this.state;
 
         return (
             <div>
-                <div style={{display: this.state.show ? "block" : "none"}}>
+                <div style={{display: show ? "block" : "none"}}>
                     <ToastMessage
-                        show={this.state.show}
+                        show={show}
                         message={"Группа успешно удалена."}
                         type={"danger"}
                     />
