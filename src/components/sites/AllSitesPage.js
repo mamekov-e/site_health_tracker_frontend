@@ -67,7 +67,8 @@ class AllSitesPage extends Component {
     deleteSite = async (siteId) => {
         this.setState({deleteClicked: true})
         await this.props.deleteSite(siteId);
-        if (this.props.siteObject != null) {
+        const resp = this.props.siteObject;
+        if (resp.site.status === 204) {
             this.setState({show: true});
             setTimeout(() => {
                 this.setState({show: false, deleteClicked: false});
@@ -77,7 +78,12 @@ class AllSitesPage extends Component {
             } else {
                 await this.findAllSites(this.state.currentPage);
             }
-        } else {
+        } else if (resp.error) {
+            this.setState({error: resp.error.data.message})
+            setTimeout(() => {
+                this.setState({error: null, deleteClicked: false})
+            }, 3000);
+        } else{
             this.setState({show: false, deleteClicked: false});
         }
     };
@@ -182,6 +188,10 @@ class AllSitesPage extends Component {
         await this.findAllSites(this.state.currentPage);
     };
 
+    handleSiteCheckModalClose = () => {
+        this.setState({siteCheckModalShow: false});
+    }
+
     searchData = async (currentPage) => {
         const searchValue = this.state.search.trim();
         if (searchValue) {
@@ -216,7 +226,8 @@ class AllSitesPage extends Component {
             search,
             siteCheckModalShow,
             clickedSite,
-            deleteClicked
+            deleteClicked,
+            error
         } = this.state;
 
         return (
@@ -229,9 +240,14 @@ class AllSitesPage extends Component {
                     />
                 </div>
                 {siteCheckModalShow && (
-                    <SiteCheckLogsModal handleModalClose={this.refreshPage}
+                    <SiteCheckLogsModal handleModalClose={this.handleSiteCheckModalClose}
                                         siteCheckModalShow={siteCheckModalShow}
                                         site={clickedSite}/>
+                )}
+                {error && (
+                    <div className={"error-message"}>
+                        {error}
+                    </div>
                 )}
                 <Card className={"border border-dark bg-dark text-white"}>
                     <Card.Header>

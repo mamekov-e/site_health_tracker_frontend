@@ -79,7 +79,7 @@ class SitesOfGroup extends Component {
         await this.props.fetchSiteGroup(siteGroupId);
         let siteGroup = this.props.siteGroupObject.siteGroup;
 
-        if (siteGroup != null) {
+        if (siteGroup) {
             this.setState({
                 siteGroup: {
                     name: siteGroup.name,
@@ -96,7 +96,8 @@ class SitesOfGroup extends Component {
         const siteGroupId = this.state.siteGroupId;
         await this.props.deleteSitesOfGroup(siteGroupId, sites);
         const resp = this.props.siteGroupObject;
-        if (!resp.error) {
+        console.log(resp)
+        if (resp.siteGroup.status === 204) {
             this.setState({show: true});
             setTimeout(() => {
                 this.setState({show: false, deleteClicked: false});
@@ -107,11 +108,13 @@ class SitesOfGroup extends Component {
             } else {
                 await this.findAllGroupSitesById(currentPage, siteGroupId);
             }
-        } else {
+        } else if (resp.error) {
             this.setState({error: resp.error.data.message})
             setTimeout(() => {
                 this.setState({error: null, deleteClicked: false})
             }, 3000);
+        } else {
+            this.setState({show: false, deleteClicked: false});
         }
     };
 
@@ -250,9 +253,12 @@ class SitesOfGroup extends Component {
         }
     }
 
-    handleModalClose = async () => {
+    handleSearchSiteModalClose = async () => {
         this.setState({addSiteToGroupShow: false})
         await this.refreshData()
+    }
+    handleSiteCheckModalClose = () => {
+        this.setState({siteCheckModalShow: false})
     }
 
     render() {
@@ -271,12 +277,12 @@ class SitesOfGroup extends Component {
                     />
                 </div>
                 {addSiteToGroupShow && (
-                    <SearchAndAddSiteModal handleModalClose={this.handleModalClose}
+                    <SearchAndAddSiteModal handleModalClose={this.handleSearchSiteModalClose}
                                            addSiteToGroupShow={addSiteToGroupShow}
                                            siteGroupId={this.state.siteGroupId}/>
                 )}
                 {siteCheckModalShow && (
-                    <SiteCheckLogsModal handleModalClose={this.refreshData}
+                    <SiteCheckLogsModal handleModalClose={this.handleSiteCheckModalClose}
                                         siteCheckModalShow={siteCheckModalShow}
                                         site={clickedSite}/>
                 )}
@@ -392,7 +398,9 @@ class SitesOfGroup extends Component {
                                                     size="sm"
                                                     variant="outline-danger"
                                                     disabled={deleteClicked}
-                                                    onClick={() => this.deleteSitesOfGroupById(site)}
+                                                    onClick={async () => {
+                                                        await this.deleteSitesOfGroupById(site)
+                                                    }}
                                                 >
                                                     <FontAwesomeIcon icon={faTrash}/>
                                                 </Button>

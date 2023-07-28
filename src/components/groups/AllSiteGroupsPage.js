@@ -66,7 +66,8 @@ class AllSiteGroupsPage extends Component {
     deleteSiteGroup = async (siteGroupId) => {
         this.setState({deleteClicked: true})
         await this.props.deleteSiteGroup(siteGroupId);
-        if (this.props.siteGroupObject != null) {
+        const resp = this.props.siteGroupObject;
+        if (resp.siteGroup.status === 204) {
             this.setState({show: true});
             setTimeout(() => {
                 this.setState({show: false, deleteClicked: false})
@@ -76,7 +77,12 @@ class AllSiteGroupsPage extends Component {
             } else {
                 await this.findAllSiteGroups(this.state.currentPage);
             }
-        } else {
+        } else if (resp.error) {
+            this.setState({error: resp.error.data.message})
+            setTimeout(() => {
+                this.setState({error: null, deleteClicked: false})
+            }, 3000);
+        } else{
             this.setState({show: false, deleteClicked: false});
         }
     };
@@ -183,16 +189,16 @@ class AllSiteGroupsPage extends Component {
 
     searchData = async (currentPage) => {
         const searchValue = this.state.search.trim();
-        if (searchValue !== "") {
+        if (searchValue) {
             currentPage -= 1;
             try {
-                const sitesPerPage = this.state.sitesPerPage
-                const resp = await axios.get(`${BASE_URL}/site-groups/search/${searchValue}?page=${currentPage}&size=${sitesPerPage}`);
+                const siteGroupsPerPage = this.state.siteGroupsPerPage
+                const resp = await axios.get(`${BASE_URL}/site-groups/search/${searchValue}?page=${currentPage}&size=${siteGroupsPerPage}`);
 
                 const data = resp.data;
 
                 this.setState({
-                    sites: data.content,
+                    siteGroups: data.content,
                     totalPages: data.totalPages,
                     totalElements: data.totalElements,
                     currentPage: data.number + 1,
@@ -207,7 +213,7 @@ class AllSiteGroupsPage extends Component {
     };
 
     render() {
-        const {siteGroups, currentPage, totalPages, search, show, deleteClicked} = this.state;
+        const {siteGroups, currentPage, totalPages, search, show, deleteClicked, error} = this.state;
 
         return (
             <div>
@@ -218,6 +224,11 @@ class AllSiteGroupsPage extends Component {
                         type={"danger"}
                     />
                 </div>
+                {error && (
+                    <div className={"error-message"}>
+                        {error}
+                    </div>
+                )}
                 <Card className={"border border-dark bg-dark text-white"}>
                     <Card.Header>
                         <div className={"content-header"}>
@@ -242,7 +253,9 @@ class AllSiteGroupsPage extends Component {
                                         type="button"
                                         className={"m-1"}
                                         disabled={deleteClicked}
-                                        onClick={this.searchData}
+                                        onClick={async ()=> {
+                                            await this.searchData()
+                                        }}
                                     >
                                         <FontAwesomeIcon icon={faSearch}/>
                                     </Button>

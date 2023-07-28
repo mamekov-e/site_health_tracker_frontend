@@ -51,7 +51,7 @@ export const deleteSite = (siteId) => {
         });
         try {
             const response = await axios.delete(`${BASE_URL}/sites/${siteId}`)
-            dispatch(siteSuccess(response.data));
+            dispatch(siteSuccess(response));
         } catch (error) {
             dispatch(siteFailure(error));
         }

@@ -23,7 +23,7 @@ export const addSitesToGroup = (siteGroupId, sites) => {
         });
         try {
             const response = await axios.post(`${BASE_URL}/site-groups/${siteGroupId}/sites/add`, sites)
-            dispatch(siteGroupSuccess(response.data));
+            dispatch(siteGroupSuccess(response));
         } catch (error) {
             dispatch(siteGroupFailure(error));
         }
@@ -65,7 +65,7 @@ export const deleteSiteGroup = (siteGroupId) => {
         });
         try {
             const response = await axios.delete(`${BASE_URL}/site-groups/${siteGroupId}`)
-            dispatch(siteGroupSuccess(response.data));
+            dispatch(siteGroupSuccess(response));
         } catch (error) {
             dispatch(siteGroupFailure(error));
         }
@@ -80,7 +80,7 @@ export const deleteSitesOfGroup = (siteGroupId, sites) => {
         });
         try {
             const response = await axios.post(`${BASE_URL}/site-groups/${siteGroupId}/sites/delete`, sites)
-            dispatch(siteGroupSuccess(response.data));
+            dispatch(siteGroupSuccess(response));
         } catch (error) {
             dispatch(siteGroupFailure(error));
         }

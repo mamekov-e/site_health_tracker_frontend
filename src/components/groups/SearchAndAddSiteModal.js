@@ -57,7 +57,7 @@ class SearchAndAddSiteModal extends Component {
         }
     }
 
-    addSitesToGroup = async (site) => {
+    addSitesToGroupFunc = async (site) => {
         this.setState({submitClicked: true})
 
         let sites = []
@@ -65,16 +65,20 @@ class SearchAndAddSiteModal extends Component {
 
         await this.props.addSitesToGroup(this.state.siteGroupId, sites);
         const resp = this.props.siteGroupObject;
-        if (!resp.error) {
+        console.log(resp)
+        console.log(this.state.error)
+        if (resp.siteGroup.status === 201) {
             this.setState({show: true});
             setTimeout(() => {
                 this.setState({show: false, submitClicked: false})
             }, 2000);
-        } else {
+        } else if (resp.error) {
             this.setState({error: resp.error.data.message, show: true})
             setTimeout(() => {
-                this.setState({show: false, submitClicked: false})
+                this.setState({show: false, submitClicked: false, error: null})
             }, 3000);
+        } else{
+            this.setState({show: false, deleteClicked: false});
         }
     };
 
@@ -163,8 +167,9 @@ class SearchAndAddSiteModal extends Component {
         });
     };
 
-    refreshSearch = () => {
-        this.setState({search: "", sites: []});
+    refreshSearch = async () => {
+        this.setState({search: ""});
+        await this.findAllSites(this.state.currentPage)
     };
 
     searchData = async (currentPage) => {
@@ -185,7 +190,7 @@ class SearchAndAddSiteModal extends Component {
                 });
                 this.getAllPageNumbers(data.totalPages)
             } catch (e) {
-                // console.log(e)
+                console.log(e)
             }
         } else {
             this.setState({search: ""})
@@ -295,7 +300,7 @@ class SearchAndAddSiteModal extends Component {
                                                     variant="primary"
                                                     disabled={submitClicked}
                                                     onClick={async () => {
-                                                        await this.addSitesToGroup(site)
+                                                        await this.addSitesToGroupFunc(site)
                                                     }}
                                                 >
                                                     Добавить в группу

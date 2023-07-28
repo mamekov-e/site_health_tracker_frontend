@@ -44,7 +44,7 @@ class SiteGroupForm extends Component {
     findSiteGroupById = async (siteGroupId) => {
         await this.props.fetchSiteGroup(siteGroupId);
         let siteGroup = this.props.siteGroupObject.siteGroup;
-        if (siteGroup != null) {
+        if (siteGroup) {
             this.setState({
                 id: siteGroup.id,
                 name: siteGroup.name,

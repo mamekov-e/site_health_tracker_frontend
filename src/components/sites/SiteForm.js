@@ -47,7 +47,7 @@ class SiteForm extends Component {
     findSiteById = async (siteId) => {
         await this.props.fetchSite(siteId);
         let site = this.props.siteObject.site;
-        if (site != null) {
+        if (site) {
             this.setState({
                 id: site.id,
                 name: site.name,
