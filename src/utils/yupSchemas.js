@@ -14,6 +14,8 @@ export const siteGroupFormSchema = yup.object().shape({
         .max(256, "Превышен лимит количества символов 256"),
 });
 
+const urlRegex = /^(https?|ftp|file):\/\/[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]$/;
+
 export const siteFormSchema = yup.object().shape({
     name: yup.string().trim()
         .required("Обязательное поле")
@@ -21,7 +23,7 @@ export const siteFormSchema = yup.object().shape({
         .max(256, "Превышен лимит количества символов 256"),
     url: yup.string()
         .required("Обязательное поле")
-        .url("Неверный формат URL"),
+        .matches(urlRegex, "Неверный формат URL"),
     siteHealthCheckInterval: yup.number().typeError("Введите числовое значение")
         .positive("Значение интервала должно быть положительным")
         .required("Обязательное поле"),
