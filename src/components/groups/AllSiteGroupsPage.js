@@ -21,9 +21,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
 import ToastMessage from "../custom/ToastMessage";
-import axios from "axios";
 import {getGroupStatusBtnColor, getGroupStatusMsg} from "../../utils/statusConverter";
 import {BASE_URL} from "../../utils/config";
+import axiosInstance from "../../services/axiosInstance";
 
 class AllSiteGroupsPage extends Component {
     constructor(props) {
@@ -47,7 +47,7 @@ class AllSiteGroupsPage extends Component {
         try {
             const sitesPerPage = this.state.siteGroupsPerPage;
             const sortDir = this.state.sortDir;
-            const resp = await axios.get(`${BASE_URL}/site-groups?pageNumber=${currentPage}&pageSize=${sitesPerPage}&sortBy=name&sortDir=${sortDir}`);
+            const resp = await axiosInstance.get(`${BASE_URL}/site-groups?pageNumber=${currentPage}&pageSize=${sitesPerPage}&sortBy=name&sortDir=${sortDir}`);
             const data = resp.data;
 
             const totalPages = data.totalPages;
@@ -71,7 +71,7 @@ class AllSiteGroupsPage extends Component {
             this.setState({show: true});
             setTimeout(() => {
                 this.setState({show: false, deleteClicked: false})
-            }, 2000);
+            }, 1500);
             if (this.isLastElementOnPage() && this.state.currentPage !== 1) {
                 await this.findAllSiteGroups(this.state.currentPage - 1);
             } else {
@@ -81,7 +81,7 @@ class AllSiteGroupsPage extends Component {
             this.setState({error: resp.error.data.message})
             setTimeout(() => {
                 this.setState({error: null, deleteClicked: false})
-            }, 3000);
+            }, 1500);
         } else{
             this.setState({show: false, deleteClicked: false});
         }
@@ -193,7 +193,7 @@ class AllSiteGroupsPage extends Component {
             currentPage -= 1;
             try {
                 const siteGroupsPerPage = this.state.siteGroupsPerPage
-                const resp = await axios.get(`${BASE_URL}/site-groups/search/${searchValue}?page=${currentPage}&size=${siteGroupsPerPage}`);
+                const resp = await axiosInstance.get(`${BASE_URL}/site-groups/search/${searchValue}?page=${currentPage}&size=${siteGroupsPerPage}`);
 
                 const data = resp.data;
 

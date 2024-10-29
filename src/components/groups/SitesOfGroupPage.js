@@ -101,7 +101,7 @@ class SitesOfGroup extends Component {
             this.setState({show: true});
             setTimeout(() => {
                 this.setState({show: false, deleteClicked: false});
-            }, 2000);
+            }, 1500);
             const currentPage = this.state.currentPage;
             if (this.isLastElementOnPage() && currentPage !== 1) {
                 await this.findAllGroupSitesById(currentPage - 1, siteGroupId);
@@ -112,7 +112,7 @@ class SitesOfGroup extends Component {
             this.setState({error: resp.error.data.message})
             setTimeout(() => {
                 this.setState({error: null, deleteClicked: false})
-            }, 3000);
+            }, 1500);
         } else {
             this.setState({show: false, deleteClicked: false});
         }

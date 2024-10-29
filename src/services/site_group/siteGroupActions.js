@@ -1,5 +1,5 @@
 import * as SGT from "./siteGroupTypes";
-import axios from "axios";
+import axiosInstance from "../axiosInstance";
 import {BASE_URL} from "../../utils/config";
 
 export const saveSiteGroup = (siteGroup) => {
@@ -8,7 +8,7 @@ export const saveSiteGroup = (siteGroup) => {
             type: SGT.SAVE_SITE_GROUP_REQUEST,
         });
         try {
-            const response = await axios.post(`${BASE_URL}/site-groups`, siteGroup)
+            const response = await axiosInstance.post(`${BASE_URL}/site-groups`, siteGroup)
             dispatch(siteGroupSuccess(response.data));
         } catch (error) {
             dispatch(siteGroupFailure(error));
@@ -22,7 +22,7 @@ export const addSitesToGroup = (siteGroupId, sites) => {
             type: SGT.ADD_SITES_TO_GROUP_REQUEST,
         });
         try {
-            const response = await axios.post(`${BASE_URL}/site-groups/${siteGroupId}/sites/add`, sites)
+            const response = await axiosInstance.post(`${BASE_URL}/site-groups/${siteGroupId}/sites/add`, sites)
             dispatch(siteGroupSuccess(response));
         } catch (error) {
             dispatch(siteGroupFailure(error));
@@ -36,7 +36,7 @@ export const fetchSiteGroup = (siteGroupId) => {
             type: SGT.FETCH_SITE_GROUP_REQUEST,
         });
         try {
-            const response = await axios.get(`${BASE_URL}/site-groups/${siteGroupId}`)
+            const response = await axiosInstance.get(`${BASE_URL}/site-groups/${siteGroupId}`)
             dispatch(siteGroupSuccess(response.data));
         } catch (error) {
             dispatch(siteGroupFailure(error));
@@ -50,7 +50,7 @@ export const updateSiteGroup = (siteGroup) => {
             type: SGT.UPDATE_SITE_GROUP_REQUEST,
         });
         try {
-            const response = await axios.put(`${BASE_URL}/site-groups`, siteGroup)
+            const response = await axiosInstance.put(`${BASE_URL}/site-groups`, siteGroup)
             dispatch(siteGroupSuccess(response.data));
         } catch (error) {
             dispatch(siteGroupFailure(error));
@@ -64,7 +64,7 @@ export const deleteSiteGroup = (siteGroupId) => {
             type: SGT.DELETE_SITE_GROUP_REQUEST,
         });
         try {
-            const response = await axios.delete(`${BASE_URL}/site-groups/${siteGroupId}`)
+            const response = await axiosInstance.delete(`${BASE_URL}/site-groups/${siteGroupId}`)
             dispatch(siteGroupSuccess(response));
         } catch (error) {
             dispatch(siteGroupFailure(error));
@@ -79,7 +79,7 @@ export const deleteSitesOfGroup = (siteGroupId, sites) => {
             type: SGT.DELETE_SITES_OF_GROUP_REQUEST,
         });
         try {
-            const response = await axios.post(`${BASE_URL}/site-groups/${siteGroupId}/sites/delete`, sites)
+            const response = await axiosInstance.post(`${BASE_URL}/site-groups/${siteGroupId}/sites/delete`, sites)
             dispatch(siteGroupSuccess(response));
         } catch (error) {
             dispatch(siteGroupFailure(error));

@@ -6,9 +6,9 @@ import 'chartjs-adapter-date-fns';
 import {Line} from "react-chartjs-2";
 import {getTodayDate, parseDatesInArray} from "../../utils/dateUtil";
 import {convertStatusesToBinaryArr} from "../../utils/statusConverter";
-import axios from "axios";
 import ToastMessage from "../custom/ToastMessage";
 import {BASE_URL} from "../../utils/config";
+import axiosInstance from "../../services/axiosInstance";
 
 
 ChartJS.register(
@@ -56,7 +56,7 @@ const SiteCheckLogsModal = ({handleModalClose, siteCheckModalShow, site}) => {
 
     const findAllSiteCheckLogsByDate = async (date) => {
         try {
-            const response = await axios.get(`${BASE_URL}/site-check-logs/${site.id}?date=${date}`);
+            const response = await axiosInstance.get(`${BASE_URL}/site-check-logs/${site.id}?date=${date}`);
             const data = response.data;
 
             if (!data.length) {
@@ -64,7 +64,7 @@ const SiteCheckLogsModal = ({handleModalClose, siteCheckModalShow, site}) => {
                 setTimeout(() => {
                     setShow(false)
                     updateChartData([], [])
-                }, 4000)
+                }, 2000)
                 return;
             }
 

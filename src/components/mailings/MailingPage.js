@@ -37,10 +37,6 @@ class SiteForm extends Component {
         yup.setLocale(ru);
     }
 
-    resetEmail = () => {
-        this.setState({email: "", subscribe: true});
-    };
-
     submitEmail = async (values) => {
         this.setState({submitClicked: true})
         const email = {
@@ -57,23 +53,25 @@ class SiteForm extends Component {
             this.setState({show: true});
             setTimeout(() => {
                 this.setState({email: "", show: false, submitClicked: false})
-            }, 2000);
+            }, 1500);
         } else if (resp.error) {
             this.setState({error: resp.error.data.message})
             setTimeout(() => {
                 this.setState({error: null, submitClicked: false})
-            }, 3000);
+            }, 1500);
         }
     };
 
-    handleSubscribe = () => {
+    handleSubscribe = (value) => {
+        console.log(value);
         this.setState((prevState) => ({
-            subscribe: !prevState.subscribe,
+            ...prevState,
+            subscribe: value,
         }))
     }
 
     render() {
-        const {error, subscribe, show, submitClicked} = this.state;
+        const {error, subscribe, show} = this.state;
         const {Formik} = formik;
         return (
             <div>
@@ -98,12 +96,11 @@ class SiteForm extends Component {
                     </Card.Header>
                     <Formik
                         initialValues={{
-                            email: "",
+                            email: JSON.parse(localStorage.getItem("user")).email,
                             subscribe: subscribe
                         }}
                         innerRef={this.formikRef}
                         validationSchema={emailSchema}
-                        onReset={this.resetEmail}
                         onSubmit={this.submitEmail}
                     >
                         {({handleSubmit, handleReset, handleChange, values, errors}) => (
@@ -117,10 +114,10 @@ class SiteForm extends Component {
                                     <Form.Row className={"w-25 h-100 form-row1 d-flex flex-column"}>
                                         <div className={"d-flex justify-content-around"}>
                                             <Form.Group as={Col} controlId="formGridEmail">
-                                                <Form.Label>Почта</Form.Label>
+                                                <Form.Label>Ваша почта</Form.Label>
                                                 <Form.Control
                                                     autoComplete="off"
-                                                    readOnly={show}
+                                                    readOnly={true}
                                                     type="text"
                                                     name="email"
                                                     value={values.email.trimStart()}
@@ -133,35 +130,24 @@ class SiteForm extends Component {
                                                     {errors.email}
                                                 </Form.Control.Feedback>
                                             </Form.Group>
-                                            <Form.Group controlId="subscribed"
-                                                        className={"d-flex justify-content-center"}>
-                                                <Form.Check
-                                                    type="checkbox"
-                                                    checked={subscribe}
-                                                    className={"checkbox-style"}
-                                                    onChange={this.handleSubscribe}
-                                                    disabled={submitClicked}
-                                                />
-                                            </Form.Group>
                                         </div>
                                         <div style={{display: "flex", justifyContent: "space-between", gap: "15px"}}>
                                             <Button size="sm"
                                                     variant="success"
                                                     type="submit"
-                                                    style={{width: "50%"}}>
-                                                {subscribe ? "Подписаться" : "Отписаться"}
+                                                    onClick={() => this.handleSubscribe(true)}
+                                                    style={{width: "50%"}}>Подписаться
                                             </Button>{"  "}
                                             <Button size="sm"
                                                     variant="info"
-                                                    type="reset"
-                                                    style={{width: "50%"}}>
-                                                <FontAwesomeIcon icon={faUndo}/> Сбросить
+                                                    type="submit"
+                                                    onClick={() => this.handleSubscribe(false)}
+                                                    style={{width: "50%"}}>Отписаться
                                             </Button>
                                         </div>
                                         <div>
                                             <p style={{fontSize: "14px"}}>Подпишитесь на получение уведомлений о статусе
-                                                изменений групп. После ввода почты нажмите подписаться.
-                                                На Ваш адрес почты будет отправлено письмо для подтверждения подписки.
+                                                изменений групп. На Ваш адрес почты будет отправлено письмо для подтверждения подписки.
                                                 Если Вы не получили письмо проверьте папку "Спам". Убедитесь в
                                                 корректности почты в случае если письма нигде нет.</p>
                                         </div>

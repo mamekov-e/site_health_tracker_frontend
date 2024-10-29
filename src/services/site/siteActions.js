@@ -1,6 +1,6 @@
 import * as ST from "./siteTypes";
-import axios from "axios";
 import {BASE_URL} from "../../utils/config";
+import axiosInstance from "../axiosInstance";
 
 export const saveSite = (site) => {
     return async (dispatch) => {
@@ -8,7 +8,7 @@ export const saveSite = (site) => {
             type: ST.SAVE_SITE_REQUEST,
         });
         try {
-            const response = await axios.post(`${BASE_URL}/sites`, site)
+            const response = await axiosInstance.post(`${BASE_URL}/sites`, site)
             dispatch(siteSuccess(response.data));
         } catch (error) {
             dispatch(siteFailure(error));
@@ -22,7 +22,7 @@ export const fetchSite = (siteId) => {
             type: ST.FETCH_SITE_REQUEST,
         });
         try {
-            const response = await axios.get(`${BASE_URL}/sites/${siteId}`)
+            const response = await axiosInstance.get(`${BASE_URL}/sites/${siteId}`)
             dispatch(siteSuccess(response.data));
         } catch (error) {
             dispatch(siteFailure(error));
@@ -36,7 +36,7 @@ export const updateSite = (site) => {
             type: ST.UPDATE_SITE_REQUEST,
         });
         try {
-            const response = await axios.put(`${BASE_URL}/sites`, site)
+            const response = await axiosInstance.put(`${BASE_URL}/sites`, site)
             dispatch(siteSuccess(response.data));
         } catch (error) {
             dispatch(siteFailure(error));
@@ -50,7 +50,7 @@ export const deleteSite = (siteId) => {
             type: ST.DELETE_SITE_REQUEST,
         });
         try {
-            const response = await axios.delete(`${BASE_URL}/sites/${siteId}`)
+            const response = await axiosInstance.delete(`${BASE_URL}/sites/${siteId}`)
             dispatch(siteSuccess(response));
         } catch (error) {
             dispatch(siteFailure(error));

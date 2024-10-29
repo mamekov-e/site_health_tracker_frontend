@@ -13,9 +13,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {addSitesToGroup} from "../../services";
 import {connect} from "react-redux";
-import axios from "axios";
 import ToastMessage from "../custom/ToastMessage";
 import {BASE_URL} from "../../utils/config";
+import axiosInstance from "../../services/axiosInstance";
 
 class SearchAndAddSiteModal extends Component {
     constructor(props) {
@@ -41,7 +41,7 @@ class SearchAndAddSiteModal extends Component {
         try {
             const sitesPerPage = this.state.sitesPerPage;
             const sortDir = this.state.sortDir;
-            const resp = await axios.get(`${BASE_URL}/sites?pageNumber=${currentPage}&pageSize=${sitesPerPage}&sortBy=name&sortDir=${sortDir}`);
+            const resp = await axiosInstance.get(`${BASE_URL}/sites?pageNumber=${currentPage}&pageSize=${sitesPerPage}&sortBy=name&sortDir=${sortDir}`);
             const data = resp.data;
 
             const totalPages = data.totalPages;
@@ -71,13 +71,13 @@ class SearchAndAddSiteModal extends Component {
             this.setState({show: true});
             setTimeout(() => {
                 this.setState({show: false, submitClicked: false})
-            }, 2000);
+            }, 1500);
         } else if (resp.error) {
             this.setState({error: resp.error.data.message, show: true})
             setTimeout(() => {
                 this.setState({show: false, submitClicked: false, error: null})
-            }, 3000);
-        } else{
+            }, 1500);
+        } else {
             this.setState({show: false, deleteClicked: false});
         }
     };
@@ -178,7 +178,7 @@ class SearchAndAddSiteModal extends Component {
             currentPage -= 1;
             try {
                 const sitesPerPage = this.state.sitesPerPage
-                const resp = await axios.get(`${BASE_URL}/sites/search/${searchValue}?page=${currentPage}&size=${sitesPerPage}`);
+                const resp = await axiosInstance.get(`${BASE_URL}/sites/search/${searchValue}?page=${currentPage}&size=${sitesPerPage}`);
 
                 const data = resp.data;
 

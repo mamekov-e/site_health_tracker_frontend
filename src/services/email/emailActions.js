@@ -1,5 +1,5 @@
 import * as ET from "./emailTypes";
-import axios from "axios";
+import axiosInstance from "../axiosInstance";
 import {BASE_URL} from "../../utils/config";
 
 export const unregisterEmail = (email) => {
@@ -8,7 +8,7 @@ export const unregisterEmail = (email) => {
             type: ET.UNREGISTER_EMAIL_REQUEST,
         });
         try {
-            const response = await axios.post(`${BASE_URL}/emails/unregister`, null, {params: email})
+            const response = await axiosInstance.post(`${BASE_URL}/emails/unregister`, null, {params: email})
             dispatch(emailSuccess(response.data));
         } catch (error) {
             dispatch(emailFailure(error));
@@ -23,7 +23,7 @@ export const registerEmail = (email) => {
             type: ET.REGISTER_EMAIL_REQUEST,
         });
         try {
-            const response = await axios.post(`${BASE_URL}/emails/register`, null, {params: email})
+            const response = await axiosInstance.post(`${BASE_URL}/emails/register`, null, {params: email})
             dispatch(emailSuccess(response.data));
         } catch (error) {
             dispatch(emailFailure(error));

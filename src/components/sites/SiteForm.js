@@ -95,12 +95,12 @@ class SiteForm extends Component {
             setTimeout(() => {
                 this.setState({show: false, submitClicked: false})
                 this.siteList()
-            }, 2000);
+            }, 1500);
         } else if (resp.error) {
             this.setState({error: resp.error.data.message})
             setTimeout(() => {
                 this.setState({error: null, submitClicked: false})
-            }, 3000);
+            }, 1500);
         } else {
             this.setState({show: false, submitClicked: false});
         }

@@ -21,9 +21,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
 import ToastMessage from "../custom/ToastMessage";
-import axios from "axios";
 import SiteCheckLogsModal from "./SiteCheckLogsModal";
 import {BASE_URL} from "../../utils/config";
+import axiosInstance from "../../services/axiosInstance";
 
 class AllSitesPage extends Component {
     constructor(props) {
@@ -48,7 +48,7 @@ class AllSitesPage extends Component {
         try {
             const sitesPerPage = this.state.sitesPerPage;
             const sortDir = this.state.sortDir;
-            const resp = await axios.get(`${BASE_URL}/sites?pageNumber=${currentPage}&pageSize=${sitesPerPage}&sortBy=name&sortDir=${sortDir}`);
+            const resp = await axiosInstance.get(`${BASE_URL}/sites?pageNumber=${currentPage}&pageSize=${sitesPerPage}&sortBy=name&sortDir=${sortDir}`);
             const data = resp.data;
 
             const totalPages = data.totalPages;
@@ -68,21 +68,22 @@ class AllSitesPage extends Component {
         this.setState({deleteClicked: true})
         await this.props.deleteSite(siteId);
         const resp = this.props.siteObject;
+        console.log("resp delete site", resp)
         if (resp.site.status === 204) {
             this.setState({show: true});
             setTimeout(() => {
                 this.setState({show: false, deleteClicked: false});
-            }, 2000);
+            }, 1500);
             if (this.isLastElementOnPage() && this.state.currentPage !== 1) {
                 await this.findAllSites(this.state.currentPage - 1);
             } else {
                 await this.findAllSites(this.state.currentPage);
             }
         } else if (resp.error) {
-            this.setState({error: resp.error.data.message})
+            this.setState({error: resp.error.data.message || "Ошибка сервера"})
             setTimeout(() => {
                 this.setState({error: null, deleteClicked: false})
-            }, 3000);
+            }, 1500);
         } else{
             this.setState({show: false, deleteClicked: false});
         }
@@ -198,7 +199,7 @@ class AllSitesPage extends Component {
             currentPage -= 1;
             try {
                 const sitesPerPage = this.state.sitesPerPage
-                const resp = await axios.get(`${BASE_URL}/sites/search/${searchValue}?page=${currentPage}&size=${sitesPerPage}`);
+                const resp = await axiosInstance.get(`${BASE_URL}/sites/search/${searchValue}?page=${currentPage}&size=${sitesPerPage}`);
 
                 const data = resp.data;
 
