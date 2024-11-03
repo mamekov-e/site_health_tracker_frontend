@@ -7,8 +7,8 @@ import "./../../assets/css/style.css";
 import {Button, ButtonGroup, Card, FormControl, InputGroup, Table,} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
+    faChartLine,
     faEdit,
-    faExternalLinkAlt,
     faFastBackward,
     faFastForward,
     faList,
@@ -371,7 +371,7 @@ class AllSitesPage extends Component {
                                                         this.setState({siteCheckModalShow: true, clickedSite: site})
                                                     }}
                                                 >
-                                                    <FontAwesomeIcon icon={faExternalLinkAlt}/>
+                                                    <FontAwesomeIcon icon={faChartLine}/>
                                                 </Button>
                                             </ButtonGroup>
                                         </td>

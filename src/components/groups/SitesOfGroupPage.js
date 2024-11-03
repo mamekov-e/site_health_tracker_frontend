@@ -24,6 +24,7 @@ import {getGroupStatusBtnColor, getGroupStatusMsg} from "../../utils/statusConve
 import SearchAndAddSiteModal from "./SearchAndAddSiteModal";
 import SiteCheckLogsModal from "../sites/SiteCheckLogsModal";
 import {BASE_URL} from "../../utils/config";
+import axiosInstance from "../../services/axiosInstance";
 
 class SitesOfGroup extends Component {
     constructor(props) {
@@ -59,7 +60,7 @@ class SitesOfGroup extends Component {
         try {
             const sitesPerPage = this.state.sitesPerPage;
             const sortDir = this.state.sortDir;
-            const resp = await axios.get(`${BASE_URL}/site-groups/${siteGroupId}/sites?pageNumber=${currentPage}&pageSize=${sitesPerPage}&sortBy=name&sortDir=${sortDir}`);
+            const resp = await axiosInstance.get(`${BASE_URL}/site-groups/${siteGroupId}/sites?pageNumber=${currentPage}&pageSize=${sitesPerPage}&sortBy=name&sortDir=${sortDir}`);
             const data = resp.data;
 
             const totalPages = data.totalPages;
@@ -234,7 +235,7 @@ class SitesOfGroup extends Component {
                 currentPageForSearch -= 1;
                 const sitesPerPage = this.state.sitesPerPage
                 const siteGroupId = this.state.siteGroupId
-                const resp = await axios.get(`${BASE_URL}/site-groups/${siteGroupId}/sites/search/${searchValue}?page=${currentPageForSearch}&size=${sitesPerPage}`);
+                const resp = await axiosInstance.get(`${BASE_URL}/site-groups/${siteGroupId}/sites/search/${searchValue}?page=${currentPageForSearch}&size=${sitesPerPage}`);
                 const data = resp.data;
 
                 this.setState({
