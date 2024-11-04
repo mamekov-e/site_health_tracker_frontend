@@ -13,7 +13,8 @@ class NavBar extends React.Component {
     };
 
     render() {
-        const {isAuthenticated} = this.props;
+        const { isAuthenticated, currentUser } = this.props;
+        const isAdmin = currentUser && currentUser.roles.includes("ROLE_ADMIN");
 
         return (
             <Navbar bg="dark" data-bs-theme="dark" className={"mb-3"}>
@@ -35,6 +36,11 @@ class NavBar extends React.Component {
                                   style={{color: '#F4EEE0'}}>
                                 | Все группы |
                             </Link>
+                            {isAdmin && (
+                                <Link to={"/admin/users"} className={"navbar-link text-decoration-none"} style={{ color: '#F4EEE0' }}>
+                                    | Пользователи |
+                                </Link>
+                            )}
                             <Link to={"/mailings"} className={"navbar-link text-decoration-none"}
                                   style={{color: '#F4EEE0'}}>
                                 | Уведомления |
@@ -61,10 +67,17 @@ class NavBar extends React.Component {
     }
 }
 
+const mapStateToProps = (state) => {
+    return {
+        isAuthenticated: state.auth.isAuthenticated,
+        currentUser: state.auth.currentUser
+    };
+};
+
 const mapDispatchToProps = (dispatch) => {
     return {
         logoutUser: () => dispatch(logoutUser()), // Map logoutUser action to props
     };
 };
 
-export default connect(null, mapDispatchToProps)(NavBar);
+export default connect(mapStateToProps, mapDispatchToProps)(NavBar);

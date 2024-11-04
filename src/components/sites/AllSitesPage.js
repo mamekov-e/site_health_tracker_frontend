@@ -274,7 +274,7 @@ class AllSitesPage extends Component {
                                         className={"m-1"}
                                         type="button"
                                         disabled={deleteClicked}
-                                        onClick={this.searchData}
+                                        onClick={() => this.searchData(this.state.currentPage)}
                                     >
                                         <FontAwesomeIcon icon={faSearch}/>
                                     </Button>

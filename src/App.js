@@ -18,6 +18,7 @@ import SigninForm from "./components/auth/SigninForm";
 import PrivateRoute from "./components/custom/PrivateRoute";
 
 import {connect} from 'react-redux';
+import AllUsersPage from "./components/users/AllUsersPage";
 
 const App = ({isAuthenticated}) => {
 
@@ -51,6 +52,8 @@ const App = ({isAuthenticated}) => {
                             <PrivateRoute path="/site-groups/add" exact component={SiteGroupForm}
                                           isAuthenticated={isAuthenticated}/>
                             <PrivateRoute path="/site-groups/edit/:id" exact component={SiteGroupForm}
+                                          isAuthenticated={isAuthenticated}/>
+                            <PrivateRoute path="/admin/users" exact component={AllUsersPage}
                                           isAuthenticated={isAuthenticated}/>
                             <PrivateRoute path="/mailings" exact component={MailingPage}
                                           isAuthenticated={isAuthenticated}/>

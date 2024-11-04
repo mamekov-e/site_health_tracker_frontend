@@ -1,100 +1,57 @@
 import React, {Component} from "react";
-
 import {connect} from "react-redux";
-import {deleteSiteGroup} from "../../services/index";
-
 import "./../../assets/css/style.css";
-import {Button, ButtonGroup, Card, FormControl, InputGroup, Table,} from "react-bootstrap";
+import {Button, Card, FormControl, InputGroup, Table} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
-    faEdit,
-    faExternalLinkAlt,
     faFastBackward,
     faFastForward,
     faList,
-    faRedo,
     faSearch,
     faStepBackward,
     faStepForward,
     faTimes,
-    faTrash,
 } from "@fortawesome/free-solid-svg-icons";
-import {Link} from "react-router-dom";
 import ToastMessage from "../custom/ToastMessage";
-import {getGroupStatusBtnColor, getGroupStatusMsg} from "../../utils/statusConverter";
-import {BASE_URL} from "../../utils/config";
 import axiosInstance from "../../services/axiosInstance";
+import {BASE_URL} from "../../utils/config";
 
-class AllSiteGroupsPage extends Component {
+class AllUsersPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            siteGroups: [],
+            users: [],
             search: "",
             currentPage: 1,
-            siteGroupsPerPage: 5,
+            usersPerPage: 5,
             pageNumbers: [{value: 1, display: 1}],
             sortDir: "asc",
+            showToast: false,
+            deleteClicked: false,
+            error: null,
         };
     }
 
     componentDidMount() {
-        this.findAllSiteGroups(this.state.currentPage);
+        this.findAllUsers(this.state.currentPage);
     }
 
-    async findAllSiteGroups(currentPage) {
+    async findAllUsers(currentPage) {
         currentPage -= 1;
         try {
-            const sitesPerPage = this.state.siteGroupsPerPage;
-            const sortDir = this.state.sortDir;
-            const resp = await axiosInstance.get(`${BASE_URL}/site-groups?pageNumber=${currentPage}&pageSize=${sitesPerPage}&sortBy=name&sortDir=${sortDir}`);
-            const data = resp.data;
+            const response = await axiosInstance.get(`${BASE_URL}/admin/users?pageNumber=${currentPage}&pageSize=${this.state.usersPerPage}&sortBy=id&sortDir=${this.state.sortDir}`);
 
-            const totalPages = data.totalPages;
+            const data = response.data;
             this.setState({
-                siteGroups: data.content,
-                totalPages: totalPages,
+                users: data.content,
+                totalPages: data.totalPages,
                 totalElements: data.totalElements,
                 currentPage: data.number + 1,
             });
-            this.getAllPageNumbers(totalPages);
-        } catch (e) {
-            console.log(e);
+            this.getAllPageNumbers(data.totalPages);
+        } catch (error) {
+            console.error(error);
         }
-    }
-
-    deleteSiteGroup = async (siteGroupId) => {
-        this.setState({deleteClicked: true})
-        await this.props.deleteSiteGroup(siteGroupId);
-        const resp = this.props.siteGroupObject;
-        if (resp.siteGroup.status === 204) {
-            this.setState({show: true});
-            setTimeout(() => {
-                this.setState({show: false, deleteClicked: false})
-            }, 1500);
-            if (this.isLastElementOnPage() && this.state.currentPage !== 1) {
-                await this.findAllSiteGroups(this.state.currentPage - 1);
-            } else {
-                await this.findAllSiteGroups(this.state.currentPage);
-            }
-        } else if (resp.error) {
-            this.setState({error: resp.error.data.message})
-            setTimeout(() => {
-                this.setState({error: null, deleteClicked: false})
-            }, 1500);
-        } else{
-            this.setState({show: false, deleteClicked: false});
-        }
-    };
-
-    isLastElementOnPage() {
-        const currentPage = this.state.currentPage;
-        const sitesPerPage = this.state.sitesPerPage;
-        const firstElementOnPage = (currentPage - 1) * sitesPerPage + 1;
-
-        const lastElementOnPage = Math.min(currentPage * sitesPerPage, this.state.totalElements);
-
-        return firstElementOnPage === lastElementOnPage;
     }
 
     getAllPageNumbers(totalPages) {
@@ -117,13 +74,13 @@ class AllSiteGroupsPage extends Component {
         this.setState({
             [event.target.name]: targetPage,
         });
-        const totalPages = Math.ceil(this.state.totalElements / this.state.siteGroupsPerPage);
+        const totalPages = Math.ceil(this.state.totalElements / this.state.sitesPerPage);
         targetPage = parseInt(targetPage);
         if (targetPage > 0 && targetPage <= totalPages) {
             if (this.state.search) {
                 await this.searchData(targetPage);
             } else {
-                await this.findAllSiteGroups(targetPage);
+                await this.findAllSites(targetPage);
             }
         }
     };
@@ -134,7 +91,7 @@ class AllSiteGroupsPage extends Component {
             if (this.state.search) {
                 await this.searchData(firstPage);
             } else {
-                await this.findAllSiteGroups(firstPage);
+                await this.findAllSites(firstPage);
             }
         }
     };
@@ -145,20 +102,20 @@ class AllSiteGroupsPage extends Component {
             if (this.state.search) {
                 await this.searchData(this.state.currentPage - prevPage);
             } else {
-                await this.findAllSiteGroups(this.state.currentPage - prevPage);
+                await this.findAllSites(this.state.currentPage - prevPage);
             }
         }
     };
 
     lastPage = async () => {
         let condition = Math.ceil(
-            this.state.totalElements / this.state.siteGroupsPerPage
+            this.state.totalElements / this.state.sitesPerPage
         );
         if (this.state.currentPage < condition) {
             if (this.state.search) {
                 await this.searchData(condition);
             } else {
-                await this.findAllSiteGroups(condition);
+                await this.findAllSites(condition);
             }
         }
     };
@@ -166,12 +123,12 @@ class AllSiteGroupsPage extends Component {
     nextPage = async () => {
         if (
             this.state.currentPage <
-            Math.ceil(this.state.totalElements / this.state.siteGroupsPerPage)
+            Math.ceil(this.state.totalElements / this.state.sitesPerPage)
         ) {
             if (this.state.search) {
                 await this.searchData(this.state.currentPage + 1);
             } else {
-                await this.findAllSiteGroups(this.state.currentPage + 1);
+                await this.findAllSites(this.state.currentPage + 1);
             }
         }
     };
@@ -183,22 +140,23 @@ class AllSiteGroupsPage extends Component {
     };
 
     refreshPage = async () => {
-        this.setState({search: ""});
-        await this.findAllSiteGroups(this.state.currentPage);
+        this.setState({search: "", siteCheckModalShow: false});
+        await this.findAllSites(this.state.currentPage);
     };
 
     searchData = async (currentPage) => {
         const searchValue = this.state.search.trim();
+
         if (searchValue) {
             currentPage -= 1;
             try {
-                const siteGroupsPerPage = this.state.siteGroupsPerPage
-                const resp = await axiosInstance.get(`${BASE_URL}/site-groups/search/${searchValue}?page=${currentPage}&size=${siteGroupsPerPage}`);
+                const usersPerPage = this.state.usersPerPage
+                const resp = await axiosInstance.get(`${BASE_URL}/admin/users/search/${searchValue}?pageNumber=${currentPage}&pageSize=${usersPerPage}&sortBy=id&sortDir=${this.state.sortDir}`);
 
                 const data = resp.data;
 
                 this.setState({
-                    siteGroups: data.content,
+                    users: data.content,
                     totalPages: data.totalPages,
                     totalElements: data.totalElements,
                     currentPage: data.number + 1,
@@ -210,52 +168,39 @@ class AllSiteGroupsPage extends Component {
         } else {
             this.setState({search: ""})
         }
-    };
+    }
 
     render() {
-        const {siteGroups, currentPage, totalPages, search, show, deleteClicked, error} = this.state;
-
+        const {users, currentPage, totalPages, search, showToast, deleteClicked, error} = this.state;
         return (
             <div>
-                <div style={{display: show ? "block" : "none"}}>
-                    <ToastMessage
-                        show={show}
-                        message={"Группа успешно удалена."}
-                        type={"danger"}
-                    />
-                </div>
-                {error && (
-                    <div className={"error-message"}>
-                        {error}
-                    </div>
-                )}
-                <Card className={"border border-dark bg-dark text-white"}>
+                {showToast && <ToastMessage show={showToast} message="Пользователь успешно удален." type="danger"/>}
+                {error && <div className="error-message">{error}</div>}
+                <Card className="border border-dark bg-dark text-white">
                     <Card.Header>
                         <div className={"content-header"}>
                             <FontAwesomeIcon icon={faList}/>
-                            <h6 style={{margin: 0}}>Список групп</h6>
+                            <h6 style={{margin: 0}}>Список пользователей</h6>
                         </div>
                         <div style={{float: "right"}}>
                             <InputGroup size="sm">
                                 <FormControl
-                                    style={{width: "250px", textColor: "blue"}}
+                                    style={{width: "250px"}}
                                     placeholder="Поиск"
                                     name="search"
-                                    disabled={deleteClicked}
                                     value={search}
                                     className={"info-border bg-dark text-white m-1"}
+                                    disabled={deleteClicked}
                                     onChange={this.searchChange}
                                 />
                                 <InputGroup.Append>
                                     <Button
                                         size="sm"
                                         variant="outline-info"
-                                        type="button"
                                         className={"m-1"}
+                                        type="button"
                                         disabled={deleteClicked}
-                                        onClick={async ()=> {
-                                            await this.searchData(this.state.currentPage)
-                                        }}
+                                        onClick={() => this.searchData(this.state.currentPage)}
                                     >
                                         <FontAwesomeIcon icon={faSearch}/>
                                     </Button>
@@ -274,87 +219,45 @@ class AllSiteGroupsPage extends Component {
                         </div>
                     </Card.Header>
                     <Card.Body>
-                        <div className={"mb-3"}>
-                            <Link
-                                to={"site-groups/add/"}
-                                className={`btn btn-sm btn-outline-light ${deleteClicked ? "disabled" : ""} `}
-                            >
-                                Добавить группу
-                            </Link>
-                            <Button
-                                style={{float: "right"}}
-                                size="sm"
-                                variant="outline-info"
-                                className={"m-1"}
-                                type="button"
-                                disabled={deleteClicked}
-                                onClick={async () => {
-                                    await this.findAllSiteGroups(currentPage)
-                                }}
-                            >
-                                Обновить <FontAwesomeIcon icon={faRedo}/>
-                            </Button>
-                        </div>
-                        <Table bordered hover striped responsive={"md"} variant="dark">
+                        <Table bordered hover striped responsive variant="dark">
                             <thead>
                             <tr>
-                                <th>Название</th>
-                                <th>Описание</th>
-                                <th>Статус</th>
-                                <th>Действия</th>
+                                <th>Имя</th>
+                                <th>Email</th>
+                                <th>Номер</th>
+                                <th>Роль</th>
                             </tr>
                             </thead>
                             <tbody>
-                            {siteGroups.length === 0 ? (
+                            {users.length === 0 ? (
                                 <tr align="center">
                                     <td colSpan="4">Список пуст</td>
                                 </tr>
                             ) : (
-                                siteGroups.map((siteGroup) => (
-                                    <tr key={siteGroup.id}>
-                                        <td> {siteGroup.name}</td>
-                                        <td>{siteGroup.description}</td>
-                                        <td>
-                                            <Button
-                                                type="button"
-                                                size={"sm"}
-                                                variant={getGroupStatusBtnColor(siteGroup)}
-                                                style={{cursor: "default", pointerEvents: "none"}}
-                                            >
-                                                {getGroupStatusMsg(siteGroup)}
-                                            </Button>
-                                        </td>
-                                        <td>
-                                            <ButtonGroup className={"d-flex gap-2"}>
-                                                <Link
-                                                    to={"site-groups/edit/" + siteGroup.id}
-                                                    className={`btn btn-sm btn-outline-primary ${deleteClicked ? "disabled" : ""} `}
-                                                >
-                                                    <FontAwesomeIcon icon={faEdit}/>
-                                                </Link>
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline-danger"
-                                                    disabled={deleteClicked}
-                                                    onClick={() => this.deleteSiteGroup(siteGroup.id)}
-                                                >
-                                                    <FontAwesomeIcon icon={faTrash}/>
-                                                </Button>
-                                                <Link
-                                                    to={"site-groups/" + siteGroup.id + "/sites"}
-                                                    className={`btn btn-sm btn-outline-warning ${deleteClicked ? "disabled" : ""} `}
-                                                >
-                                                    <FontAwesomeIcon icon={faExternalLinkAlt}/>
-                                                </Link>
-                                            </ButtonGroup>
-                                        </td>
+                                users.map((user) => (
+                                    <tr key={user.id}>
+                                        <td>{user.firstName + ' ' + user.lastName + ' ' + user.middleName}</td>
+                                        <td>{user.email}</td>
+                                        <td>{user.phone}</td>
+                                        <td>{user.roles && user.roles[0] == 'ROLE_ADMIN' ? 'админ' : 'пользователь'}</td>
+                                        {/*<td>*/}
+                                        {/*    <ButtonGroup>*/}
+                                        {/*        <Link to={`/users/edit/${user.id}`}*/}
+                                        {/*              className="btn btn-sm btn-outline-primary"*/}
+                                        {/*              disabled={deleteClicked}><FontAwesomeIcon icon={faEdit}/></Link>*/}
+                                        {/*        <Button size="sm" variant="outline-danger"*/}
+                                        {/*                onClick={() => this.deleteUser(user.id)}*/}
+                                        {/*                disabled={deleteClicked}><FontAwesomeIcon*/}
+                                        {/*            icon={faTrash}/></Button>*/}
+                                        {/*    </ButtonGroup>*/}
+                                        {/*</td>*/}
                                     </tr>
                                 ))
                             )}
                             </tbody>
                         </Table>
                     </Card.Body>
-                    {siteGroups.length > 0 ? (
+                    {users.length > 0 && (
                         <Card.Footer>
                             <div style={{float: "left"}}>
                                 Страница {currentPage} из {totalPages}
@@ -416,24 +319,16 @@ class AllSiteGroupsPage extends Component {
                                 </InputGroup>
                             </div>
                         </Card.Footer>
-                    ) : null}
+                    )}
                 </Card>
             </div>
         );
     }
 }
 
-const mapStateToProps = (state) => {
-    return {
-        siteGroupObject: state.siteGroup,
-    };
-};
+const mapStateToProps = state => ({
+    userObject: state.user,
+});
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        deleteSiteGroup: (siteGroupId) => dispatch(deleteSiteGroup(siteGroupId)),
-    };
-};
 
-export default connect(mapStateToProps, mapDispatchToProps)(AllSiteGroupsPage);
-
+export default connect(mapStateToProps)(AllUsersPage);

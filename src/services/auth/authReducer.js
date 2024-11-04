@@ -2,6 +2,7 @@ import * as AT from "./authTypes";
 
 const initialState = {
     isAuthenticated: !!localStorage.getItem("user"),
+    currentUser: localStorage.getItem("user") != null ? JSON.parse(localStorage.getItem("user")) : null,
     error: null,
     loading: false,
 };
@@ -25,6 +26,7 @@ const authReducer = (state = initialState, action) => {
             return {
                 ...state,
                 isAuthenticated: true,
+                currentUser: action.payload,
                 loading: false,
             };
         case AT.LOGOUT_USER:
