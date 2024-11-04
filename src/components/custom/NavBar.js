@@ -49,11 +49,16 @@ class NavBar extends React.Component {
                     ) : ''}
                     <Nav className={"m-0 ms-5 gap-2"}>
                         {isAuthenticated ? (
-                            <Link to="/login" className="navbar-link text-decoration-none"
-                                  style={{color: '#F4EEE0'}} onClick={this.handleLogout}>
-                                Выйти <FontAwesomeIcon icon={faSignOutAlt}
-                                                       style={{cursor: "pointer"}}/>
-                            </Link>
+                            <div className={"d-flex gap-2"}>
+                                <div style={{color: "white"}}>
+                                    {currentUser.email + '     '}
+                                </div>
+                                <Link to="/login" className="navbar-link text-decoration-none"
+                                      style={{color: '#F4EEE0'}} onClick={this.handleLogout}>
+                                    Выйти <FontAwesomeIcon icon={faSignOutAlt}
+                                                           style={{cursor: "pointer"}}/>
+                                </Link>
+                            </div>
                         ) : (
                             <Link to="/login" className="navbar-link text-decoration-none" style={{color: '#F4EEE0'}}>
                                 Войти <FontAwesomeIcon icon={faSignInAlt}
