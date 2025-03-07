@@ -1,0 +1,12 @@
+stages:
+  # - build
+  - containerize
+  - deploy
+
+include:
+  # - project: 'devops/gitlab-ci-templates'
+  #   file: 'build/build-node-sht-20.16.0.yml'
+  - project: 'devops/gitlab-ci-templates'
+    file: 'containerize/docker-front.yml'
+  - project: 'devops/gitlab-ci-templates'
+    file: 'deploy/deploy-sht-front.yml'
