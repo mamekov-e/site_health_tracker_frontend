@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bb72b985-888c-4c91-b6fa-8ad20ebd803e" name="Changes" comment="Update config">
+    <list default="true" id="bb72b985-888c-4c91-b6fa-8ad20ebd803e" name="Changes" comment="Merge conflicts">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utils/config.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/config.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -48,7 +49,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;dev&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/projects/IdeaProjects/masters-projects/dissertation/site_health_tracker_frontend&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/projects/IdeaProjects/jobs-projects/ne/bluetrain-project/services/railgis-front&quot;,
     &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.standard&quot;: &quot;true&quot;,
@@ -157,6 +158,11 @@
       <workItem from="1730207441394" duration="656000" />
       <workItem from="1730657752294" duration="12789000" />
       <workItem from="1730708075189" duration="20000" />
+      <workItem from="1742314637161" duration="2000" />
+      <workItem from="1742362976449" duration="2000" />
+      <workItem from="1744002159248" duration="2000" />
+      <workItem from="1744048772844" duration="1029000" />
+      <workItem from="1744955744084" duration="145000" />
     </task>
     <task id="LOCAL-00001" summary="Add auth">
       <option name="closed" value="true" />
@@ -190,7 +196,23 @@
       <option name="project" value="LOCAL" />
       <updated>1730681622398</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Fix config">
+      <option name="closed" value="true" />
+      <created>1742039256766</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1742039256766</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Merge conflicts">
+      <option name="closed" value="true" />
+      <created>1742039294213</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1742039294213</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -212,7 +234,9 @@
     <MESSAGE value="Change site chart link icon" />
     <MESSAGE value="Add admin panel" />
     <MESSAGE value="Update config" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update config" />
+    <MESSAGE value="Fix config" />
+    <MESSAGE value="Merge conflicts" />
+    <option name="LAST_COMMIT_MESSAGE" value="Merge conflicts" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
